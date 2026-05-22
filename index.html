@@ -5,48 +5,36 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Две стороны — по 4 числа</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%232563eb'/%3E%3Ctext x='16' y='22' text-anchor='middle' font-size='14' font-family='system-ui,sans-serif' fill='%23fff' font-weight='700'%3EAB%3C/text%3E%3C/svg%3E">
-  <link rel="stylesheet" href="styles.css?v=7">
+  <link rel="stylesheet" href="styles.css?v=10">
 </head>
 <body>
   <main class="app">
     <h1>Две стороны</h1>
     <p class="hint">
-      На каждой стороне — 4 разных числа от 1 до 8. Введите четырёхзначное число
-      (например, <strong>1234</strong> — это 1, 2, 3, 4).
+      На каждой стороне — 4 разных числа от 1 до 8. Сторона A одна, вариантов B может быть несколько.
     </p>
 
-    <section class="panel" aria-labelledby="input-heading">
-      <h2 id="input-heading">Ввод</h2>
-      <div class="inputs sides">
-        <label>
-          <span>Сторона A</span>
-          <input
-            type="text"
-            id="side-a"
-            inputmode="numeric"
-            maxlength="4"
-            pattern="[1-8]{4}"
-            placeholder="1234"
-            value="1234"
-            autocomplete="off"
-          >
-          <span class="field-error" id="error-a" hidden></span>
-        </label>
-        <label>
-          <span>Сторона B</span>
-          <input
-            type="text"
-            id="side-b"
-            inputmode="numeric"
-            maxlength="4"
-            pattern="[1-8]{4}"
-            placeholder="5678"
-            value="5678"
-            autocomplete="off"
-          >
-          <span class="field-error" id="error-b" hidden></span>
-        </label>
-      </div>
+    <section class="panel" aria-labelledby="panel-a-heading">
+      <h2 id="panel-a-heading">Сторона A</h2>
+      <label class="field-block">
+        <span>Четырёхзначное число</span>
+        <input
+          type="text"
+          id="side-a"
+          inputmode="numeric"
+          maxlength="4"
+          pattern="[1-8]{4}"
+          placeholder="1234"
+          value="1234"
+          autocomplete="off"
+        >
+        <span class="field-error" id="error-a" hidden></span>
+      </label>
+    </section>
+
+    <section class="panel" aria-labelledby="panel-b-heading">
+      <h2 id="panel-b-heading">Сторона B</h2>
+      <div id="b-rows" class="b-rows"></div>
       <button type="button" id="calc-btn" class="calc-btn">СЧИТАЕМ</button>
     </section>
 
@@ -54,34 +42,38 @@
       <h2 id="results-heading">Результаты</h2>
       <p id="results-hint" class="results-hint"></p>
 
-      <div id="results-summary" class="results-summary" hidden>
-        <h3 class="summary-title">Итого финалы</h3>
-        <ul id="finale-summary-list" class="totals-finale-list"></ul>
-      </div>
+      <div id="batch-results" class="batch-results" hidden></div>
 
-      <button type="button" id="details-btn" class="details-btn" hidden>
-        ПОДРОБНЕЕ
-      </button>
+      <div id="single-results" class="single-results">
+        <div id="results-summary" class="results-summary" hidden>
+          <h3 class="summary-title">Итого финалы</h3>
+          <ul id="finale-summary-list" class="totals-finale-list"></ul>
+        </div>
 
-      <div id="results-details" class="results-details is-collapsed">
-        <div class="table-wrap">
-          <table class="results-table">
-            <thead>
-              <tr>
-                <th>№</th>
-                <th>Начальный ход</th>
-                <th>Финальные ходы</th>
-                <th>Финал партии</th>
-                <th>Выигрыш A / B</th>
-              </tr>
-            </thead>
-            <tbody id="results-body"></tbody>
-            <tfoot id="results-foot"></tfoot>
-          </table>
+        <button type="button" id="details-btn" class="details-btn" hidden>
+          ПОДРОБНЕЕ
+        </button>
+
+        <div id="results-details" class="results-details is-collapsed">
+          <div class="table-wrap">
+            <table class="results-table">
+              <thead>
+                <tr>
+                  <th>№</th>
+                  <th>Начальный ход</th>
+                  <th>Финальные ходы</th>
+                  <th>Финал партии</th>
+                  <th>Выигрыш A / B</th>
+                </tr>
+              </thead>
+              <tbody id="results-body"></tbody>
+              <tfoot id="results-foot"></tfoot>
+            </table>
+          </div>
         </div>
       </div>
     </section>
   </main>
-  <script src="app.js?v=7"></script>
+  <script src="app.js?v=12"></script>
 </body>
 </html>

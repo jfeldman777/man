@@ -4,9 +4,8 @@ const SIDE_LEN = 4;
 const MAX_PARTY_MOVES = 500;
 
 const inputA = document.getElementById("side-a");
-const inputB = document.getElementById("side-b");
 const errorA = document.getElementById("error-a");
-const errorB = document.getElementById("error-b");
+const bRowsList = document.getElementById("b-rows");
 const calcBtn = document.getElementById("calc-btn");
 const resultsSummary = document.getElementById("results-summary");
 const finaleSummaryList = document.getElementById("finale-summary-list");
@@ -15,10 +14,11 @@ const resultsDetails = document.getElementById("results-details");
 const resultsBody = document.getElementById("results-body");
 const resultsFoot = document.getElementById("results-foot");
 const resultsHint = document.getElementById("results-hint");
+const batchResults = document.getElementById("batch-results");
+const singleResults = document.getElementById("single-results");
 
 let detailsExpanded = false;
-
-const inputs = [inputA, inputB];
+let bRowIdCounter = 0;
 
 function otherSide(side) {
   return side === "A" ? "B" : "A";
@@ -128,7 +128,7 @@ function isBetterMove(candidate, gain, type, best) {
   const typeRank = PAIR_TYPE_RANK[type] ?? 0;
   const bestTypeRank = PAIR_TYPE_RANK[best.type] ?? 0;
   if (typeRank !== bestTypeRank) return typeRank > bestTypeRank;
-  return candidate > best.move;
+  return candidate < best.move;
 }
 
 /** Тип финальной пары по последним ходам сторон A и B */
@@ -296,6 +296,255 @@ function countFinaleLabels(parties) {
   return [...counts.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
 }
 
+function variantLabel(code) {
+  return `В${code}`;
+}
+
+function getBRowElements() {
+  return [...bRowsList.querySelectorAll(".b-row")];
+}
+
+function getBInputs() {
+  return getBRowElements().map((row) => row.querySelector(".b-row-input"));
+}
+
+function createIconButton(label, title, className) {
+  const btn = document.createElement("button");
+  btn.type = "button";
+  btn.className = `row-btn ${className}`;
+  btn.textContent = label;
+  btn.title = title;
+  btn.setAttribute("aria-label", title);
+  return btn;
+}
+
+function addBRow(value = "") {
+  const id = ++bRowIdCounter;
+  const row = document.createElement("div");
+  row.className = "b-row";
+  row.dataset.rowId = String(id);
+
+  const label = document.createElement("span");
+  label.className = "b-row-label";
+
+  const input = document.createElement("input");
+  input.type = "text";
+  input.className = "b-row-input";
+  input.inputMode = "numeric";
+  input.maxLength = SIDE_LEN;
+  input.placeholder = "5678";
+  input.value = value;
+  input.autocomplete = "off";
+
+  const error = document.createElement("span");
+  error.className = "field-error b-row-error";
+  error.hidden = true;
+
+  const actions = document.createElement("div");
+  actions.className = "b-row-actions";
+
+  const field = document.createElement("div");
+  field.className = "b-row-field";
+  field.append(label, input, error);
+
+  row.append(field, actions);
+  bRowsList.appendChild(row);
+
+  input.addEventListener("input", () => {
+    sanitizeInput(input);
+    validateAllBRows();
+  });
+
+  updateBRowButtons();
+  updateBRowLabels();
+  return row;
+}
+
+function removeBRow(row) {
+  if (getBRowElements().length <= 1) return;
+  row.remove();
+  updateBRowButtons();
+  updateBRowLabels();
+  validateAllBRows();
+}
+
+function updateBRowLabels() {
+  getBRowElements().forEach((row, index) => {
+    row.querySelector(".b-row-label").textContent =
+      getBRowElements().length > 1 ? `Вариант B ${index + 1}` : "Четырёхзначное число";
+  });
+}
+
+function updateBRowButtons() {
+  const rows = getBRowElements();
+  const count = rows.length;
+
+  rows.forEach((row, index) => {
+    const actions = row.querySelector(".b-row-actions");
+    actions.innerHTML = "";
+    const isFirst = index === 0;
+    const isLast = index === count - 1;
+
+    if (count === 1) {
+      const addBtn = createIconButton("+", "Добавить вариант B", "row-btn-add");
+      addBtn.addEventListener("click", () => addBRow());
+      actions.appendChild(addBtn);
+      return;
+    }
+
+    if (isLast && !isFirst) {
+      const addBtn = createIconButton("+", "Добавить вариант B", "row-btn-add");
+      addBtn.addEventListener("click", () => addBRow());
+      const removeBtn = createIconButton("−", "Убрать вариант", "row-btn-remove");
+      removeBtn.addEventListener("click", () => removeBRow(row));
+      actions.appendChild(addBtn);
+      actions.appendChild(removeBtn);
+      return;
+    }
+
+    if (!isFirst && !isLast) {
+      const removeBtn = createIconButton("−", "Убрать вариант", "row-btn-remove");
+      removeBtn.addEventListener("click", () => removeBRow(row));
+      actions.appendChild(removeBtn);
+    }
+  });
+}
+
+function validateAllBRows() {
+  let allOk = true;
+  getBRowElements().forEach((row) => {
+    const input = row.querySelector(".b-row-input");
+    const error = row.querySelector(".b-row-error");
+    const parsed = parseSide(input.value);
+    if (!parsed.ok) {
+      allOk = false;
+      error.textContent = parsed.message;
+      error.hidden = false;
+      input.classList.add("invalid");
+    } else {
+      error.textContent = "";
+      error.hidden = true;
+      input.classList.remove("invalid");
+    }
+  });
+  return allOk;
+}
+
+function getValidatedBCodes() {
+  const codes = [];
+  let allOk = true;
+
+  getBRowElements().forEach((row) => {
+    const input = row.querySelector(".b-row-input");
+    const parsed = parseSide(input.value);
+    if (!parsed.ok) allOk = false;
+    else codes.push(input.value.trim());
+  });
+
+  return { codes, allOk };
+}
+
+function formatFinaleCountsHtml(counts) {
+  if (counts.length === 0) return "<li>—</li>";
+  return counts
+    .map(([label, n]) => `<li>${label} — ${n} ${pluralRaz(n)}</li>`)
+    .join("");
+}
+
+function hideSingleResults() {
+  singleResults.hidden = true;
+  resultsSummary.hidden = true;
+  detailsBtn.hidden = true;
+}
+
+function showSingleResults() {
+  singleResults.hidden = false;
+  batchResults.hidden = true;
+}
+
+function buildPartiesRowsHtml(parties) {
+  return parties
+    .map(
+      (p) => `
+        <tr>
+          <td>${p.index}</td>
+          <td>${p.startNum} (${p.startSide})</td>
+          <td>${p.finale.pair}</td>
+          <td class="finale-name">${p.finale.label}</td>
+          <td>${p.scores.A} / ${p.scores.B}</td>
+        </tr>
+      `
+    )
+    .join("");
+}
+
+function buildPartiesTableHtml(data) {
+  const { parties, totalA, totalB } = data;
+  return `
+    <div class="table-wrap">
+      <table class="results-table">
+        <thead>
+          <tr>
+            <th>№</th>
+            <th>Начальный ход</th>
+            <th>Финальные ходы</th>
+            <th>Финал партии</th>
+            <th>Выигрыш A / B</th>
+          </tr>
+        </thead>
+        <tbody>${buildPartiesRowsHtml(parties)}</tbody>
+        <tfoot>
+          <tr class="totals">
+            <td colspan="4">Итого выигрыш A / B</td>
+            <td>${totalA} / ${totalB}</td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  `;
+}
+
+function renderBatchResults(items) {
+  hideSingleResults();
+  batchResults.hidden = false;
+
+  batchResults.innerHTML = items
+    .map((item) => {
+      if (item.error) {
+        return `
+          <section class="batch-block batch-block-error">
+            <h3 class="batch-title">${variantLabel(item.code)}</h3>
+            <p class="batch-error">${item.error}</p>
+          </section>
+        `;
+      }
+      return `
+        <section class="batch-block">
+          <h3 class="batch-title">${variantLabel(item.code)}</h3>
+          <ul class="totals-finale-list">${formatFinaleCountsHtml(item.counts)}</ul>
+          <button type="button" class="details-btn batch-details-btn" aria-expanded="false">
+            ПОДРОБНЕЕ
+          </button>
+          <div class="batch-details is-collapsed">
+            ${buildPartiesTableHtml(item.data)}
+          </div>
+        </section>
+      `;
+    })
+    .join("");
+}
+
+function calculateAllVariants(sideA, variantCodes) {
+  return variantCodes.map((code) => {
+    const parsed = parseSide(code);
+    if (!parsed.ok) {
+      return { code, error: parsed.message };
+    }
+    const data = calculate(sideA, parsed.digits);
+    return { code, counts: countFinaleLabels(data.parties), data };
+  });
+}
+
 function setDetailsExpanded(expanded) {
   detailsExpanded = expanded;
   resultsDetails.classList.toggle("is-collapsed", !expanded);
@@ -316,19 +565,7 @@ function renderResults(data) {
   detailsBtn.hidden = false;
   setDetailsExpanded(false);
 
-  resultsBody.innerHTML = parties
-    .map(
-      (p) => `
-        <tr>
-          <td>${p.index}</td>
-          <td>${p.startNum} (${p.startSide})</td>
-          <td>${p.finale.pair}</td>
-          <td class="finale-name">${p.finale.label}</td>
-          <td>${p.scores.A} / ${p.scores.B}</td>
-        </tr>
-      `
-    )
-    .join("");
+  resultsBody.innerHTML = buildPartiesRowsHtml(parties);
 
   resultsFoot.innerHTML = `
     <tr class="totals">
@@ -340,17 +577,23 @@ function renderResults(data) {
 
 function validateInputs() {
   const parsedA = parseSide(inputA.value);
-  const parsedB = parseSide(inputB.value);
-
   setFieldError(errorA, inputA, parsedA.ok ? "" : parsedA.message);
-  setFieldError(errorB, inputB, parsedB.ok ? "" : parsedB.message);
+  const bOk = validateAllBRows();
+  const { codes, allOk: bParseOk } = getValidatedBCodes();
 
-  return { parsedA, parsedB, bothOk: parsedA.ok && parsedB.ok };
+  return {
+    parsedA,
+    bCodes: codes,
+    bothOk: parsedA.ok && bOk && bParseOk && codes.length > 0,
+  };
 }
 
 function clearResults(message) {
   resultsHint.hidden = false;
   resultsHint.textContent = message;
+  batchResults.hidden = true;
+  batchResults.innerHTML = "";
+  showSingleResults();
   resultsSummary.hidden = true;
   detailsBtn.hidden = true;
   setDetailsExpanded(false);
@@ -360,22 +603,28 @@ function clearResults(message) {
 }
 
 function calculateAndRender() {
-  const { parsedA, parsedB, bothOk } = validateInputs();
+  const { parsedA, bCodes, bothOk } = validateInputs();
 
   if (!bothOk) {
-    clearResults("Исправьте ввод на обеих сторонах и нажмите СЧИТАЕМ.");
+    clearResults("Исправьте сторону A и все варианты B, затем нажмите СЧИТАЕМ.");
     return;
   }
 
   resultsHint.hidden = true;
-  renderResults(calculate(parsedA.digits, parsedB.digits));
+
+  if (bCodes.length === 1) {
+    const parsedB = parseSide(bCodes[0]);
+    showSingleResults();
+    renderResults(calculate(parsedA.digits, parsedB.digits));
+    return;
+  }
+
+  renderBatchResults(calculateAllVariants(parsedA.digits, bCodes));
 }
 
-inputs.forEach((el) => {
-  el.addEventListener("input", () => {
-    sanitizeInput(el);
-    validateInputs();
-  });
+inputA.addEventListener("input", () => {
+  sanitizeInput(inputA);
+  validateInputs();
 });
 
 calcBtn.addEventListener("click", calculateAndRender);
@@ -384,4 +633,18 @@ detailsBtn.addEventListener("click", () => {
   setDetailsExpanded(!detailsExpanded);
 });
 
+batchResults.addEventListener("click", (event) => {
+  const btn = event.target.closest(".batch-details-btn");
+  if (!btn) return;
+
+  const block = btn.closest(".batch-block");
+  const details = block.querySelector(".batch-details");
+  const expanded = details.classList.toggle("is-collapsed");
+  const isOpen = !expanded;
+
+  btn.textContent = isOpen ? "СКРЫТЬ" : "ПОДРОБНЕЕ";
+  btn.setAttribute("aria-expanded", String(isOpen));
+});
+
+addBRow("5678");
 clearResults("Введите числа и нажмите СЧИТАЕМ.");

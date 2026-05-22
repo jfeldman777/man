@@ -119,6 +119,136 @@ input.invalid {
   outline-offset: 2px;
 }
 
+.field-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.b-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.b-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.b-row-field {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.b-row-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #444;
+}
+
+.b-row-input {
+  width: 100%;
+  padding: 0.55rem 0.65rem;
+  border: 1px solid #c5ccd6;
+  border-radius: 6px;
+  font-size: 1.25rem;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.12em;
+  text-align: center;
+}
+
+.b-row-input:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 1px;
+  border-color: #3b82f6;
+}
+
+.b-row-actions {
+  display: flex;
+  gap: 0.35rem;
+  padding-top: 1.65rem;
+  flex-shrink: 0;
+}
+
+.b-row-actions:empty {
+  display: none;
+}
+
+.row-btn {
+  width: 2.25rem;
+  height: 2.25rem;
+  padding: 0;
+  font-size: 1.25rem;
+  line-height: 1;
+  font-weight: 600;
+  border-radius: 6px;
+  border: 1px solid #c5ccd6;
+  background: #f8fafc;
+  color: #334155;
+  cursor: pointer;
+}
+
+.row-btn:hover {
+  background: #e2e8f0;
+}
+
+.row-btn-add {
+  color: #2563eb;
+  border-color: #bfdbfe;
+  background: #eff6ff;
+}
+
+.row-btn-remove {
+  color: #b91c1c;
+  border-color: #fecaca;
+  background: #fef2f2;
+}
+
+.batch-results {
+  margin-bottom: 1rem;
+}
+
+.batch-block {
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #eef1f4;
+}
+
+.batch-block .details-btn {
+  margin-top: 0.5rem;
+  margin-bottom: 0.35rem;
+}
+
+.batch-details.is-collapsed {
+  display: none;
+}
+
+.batch-details .table-wrap {
+  margin-top: 0.25rem;
+}
+
+.batch-block:last-child {
+  border-bottom: none;
+}
+
+.batch-title {
+  margin: 0 0 0.4rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.06em;
+}
+
+.batch-error {
+  margin: 0;
+  font-size: 0.88rem;
+  color: #b91c1c;
+}
+
 .results-hint {
   margin: 0 0 0.5rem;
   font-size: 0.88rem;
