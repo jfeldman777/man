@@ -153,24 +153,30 @@ function describePartyFinale(lastA, lastB) {
   return { pair, label: `война, проиграл ${loser}` };
 }
 
-function isMoveSequenceRepeating(moves) {
-  const n = moves.length;
-  if (n < 2) return false;
-
-  for (let period = 1; period <= n / 2; period++) {
-    if (n % period !== 0) continue;
-    const repeats = n / period;
-    if (repeats < 2) continue;
-
-    let ok = true;
-    for (let i = 0; i < n; i++) {
-      if (moves[i] !== moves[i % period]) {
-        ok = false;
-        break;
-      }
-    }
-    if (ok) return true;
+function getSideLastMoves(moves, startSide) {
+  let lastA = null;
+  let lastB = null;
+  for (let i = 0; i < moves.length; i++) {
+    const s = sideAtMoveIndex(startSide, i);
+    if (s === "A") lastA = moves[i];
+    else lastB = moves[i];
   }
+  return { lastA, lastB };
+}
+
+/** Ключ позиции: последний ход A и последний ход B */
+function positionKey(lastA, lastB) {
+  return `${lastA},${lastB}`;
+}
+
+/** Позиция уже была — конец партии (66 ≠ повтор, 666 = та же позиция снова) */
+function registerPosition(moves, startSide, seenPositions) {
+  const { lastA, lastB } = getSideLastMoves(moves, startSide);
+  if (lastA == null || lastB == null) return false;
+
+  const key = positionKey(lastA, lastB);
+  if (seenPositions.has(key)) return true;
+  seenPositions.add(key);
   return false;
 }
 
@@ -197,11 +203,8 @@ function chooseMove(pool, side, lastNum, lastSide) {
 function playParty(startNum, startSide, poolA, poolB) {
   const moves = [startNum];
   const scores = { A: 0, B: 0 };
+  const seenPositions = new Set();
   let endReason = "";
-
-  if (isMoveSequenceRepeating(moves)) {
-    endReason = "повторение ходов";
-  }
 
   let turn = otherSide(startSide);
   let steps = 0;
@@ -221,7 +224,7 @@ function playParty(startNum, startSide, poolA, poolB) {
 
     if (scores.A <= -100 || scores.B <= -100) {
       endReason = "война";
-    } else if (isMoveSequenceRepeating(moves)) {
+    } else if (registerPosition(moves, startSide, seenPositions)) {
       endReason = "повторение ходов";
     } else {
       turn = otherSide(turn);
@@ -233,14 +236,7 @@ function playParty(startNum, startSide, poolA, poolB) {
     endReason = "лимит ходов";
   }
 
-  let lastA = null;
-  let lastB = null;
-  for (let i = 0; i < moves.length; i++) {
-    const s = sideAtMoveIndex(startSide, i);
-    if (s === "A") lastA = moves[i];
-    else lastB = moves[i];
-  }
-
+  const { lastA, lastB } = getSideLastMoves(moves, startSide);
   const finale = describePartyFinale(lastA, lastB);
 
   return {
