@@ -21,6 +21,8 @@ const quadsPanel = document.getElementById("quads-panel");
 const quadsGrid = document.getElementById("quads-grid");
 const quadsSelectedCount = document.getElementById("quads-selected-count");
 const conflictFreeBtn = document.getElementById("conflict-free-btn");
+const helpBtn = document.getElementById("help-btn");
+const helpDialog = document.getElementById("help-dialog");
 
 let detailsExpanded = false;
 let bRowIdCounter = 0;
@@ -768,6 +770,20 @@ inputA.addEventListener("input", () => {
 calcBtn.addEventListener("click", calculateAndRender);
 
 conflictFreeBtn.addEventListener("click", calculateConflictFreeAndRender);
+
+helpBtn.addEventListener("click", () => {
+  if (typeof helpDialog.showModal === "function") {
+    helpDialog.showModal();
+  }
+});
+
+helpDialog.querySelector(".help-dialog-close").addEventListener("click", () => {
+  helpDialog.close();
+});
+
+helpDialog.addEventListener("click", (event) => {
+  if (event.target === helpDialog) helpDialog.close();
+});
 
 showQuadsBtn.addEventListener("click", () => {
   const hidden = quadsPanel.classList.toggle("is-collapsed");

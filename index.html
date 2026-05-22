@@ -5,14 +5,61 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Две стороны — по 4 числа</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%232563eb'/%3E%3Ctext x='16' y='22' text-anchor='middle' font-size='14' font-family='system-ui,sans-serif' fill='%23fff' font-weight='700'%3EAB%3C/text%3E%3C/svg%3E">
-  <link rel="stylesheet" href="styles.css?v=15">
+  <link rel="stylesheet" href="styles.css?v=16">
 </head>
 <body>
   <main class="app">
-    <h1>Две стороны</h1>
-    <p class="hint">
-      На каждой стороне — 4 разных числа от 1 до 8. Сторона A одна, вариантов B может быть несколько.
-    </p>
+    <header class="app-header">
+      <div class="app-header-text">
+        <h1>Две стороны</h1>
+        <p class="hint">
+          На каждой стороне — 4 разных числа от 1 до 8. Сторона A одна, вариантов B может быть несколько.
+        </p>
+      </div>
+      <button
+        type="button"
+        id="help-btn"
+        class="help-btn"
+        aria-label="Справка по использованию"
+        title="Справка"
+      >
+        ?
+      </button>
+    </header>
+
+    <dialog id="help-dialog" class="help-dialog" aria-labelledby="help-dialog-title">
+      <div class="help-dialog-inner">
+        <button type="button" class="help-dialog-close" aria-label="Закрыть">×</button>
+        <h2 id="help-dialog-title">Справка</h2>
+
+        <h3>Ввод</h3>
+        <ul>
+          <li><strong>Сторона A</strong> — одно четырёхзначное число (цифры 1–8, без повторов).</li>
+          <li><strong>Сторона B</strong> — одно или несколько чисел в полях; у последнего поля кнопки <strong>+</strong> и <strong>−</strong>.</li>
+        </ul>
+
+        <h3>Кнопки</h3>
+        <ul>
+          <li><strong>ПОКАЗАТЬ ВСЕ ЧЕТВЁРКИ</strong> — 38 вариантов B (цифры по возрастанию, сумма чётная). Нажмите квадратики, чтобы выбрать; выбранные подсвечены.</li>
+          <li><strong>СЧИТАЕМ</strong> — расчёт для A и B: если выбраны четвёрки — по ним; иначе по полям B. Один B — краткий итог; несколько — список <strong>В####</strong> с финалами.</li>
+          <li><strong>БЕСКОНФЛИКТНЫЕ</strong> — из 38 четвёрок оставляет только те B, где ни в одной из 8 партий с данной A нет <em>войны</em>.</li>
+        </ul>
+
+        <h3>Результаты</h3>
+        <ul>
+          <li><strong>Итого финалы</strong> — сколько раз встретились война, кооперация, конкуренция.</li>
+          <li><strong>ПОДРОБНЕЕ</strong> — таблица всех 8 партий для этого варианта B.</li>
+        </ul>
+
+        <h3>Правила партии (кратко)</h3>
+        <ul>
+          <li>8 партий: 4 старта с цифр A, 4 — с цифр B; ходы чередуются A → B → A → B.</li>
+          <li>За пару ходов: равенство — конкуренция (+2/+2); соседние цифры — кооперация (+3/+4); иначе — война (−100/+1).</li>
+          <li>Конец: война (−100), или повтор позиции (последние ходы A и B как раньше).</li>
+          <li>При равных очках за ход выбирается <strong>меньшее</strong> число из доступных.</li>
+        </ul>
+      </div>
+    </dialog>
 
     <section class="panel" aria-labelledby="panel-a-heading">
       <h2 id="panel-a-heading">Сторона A</h2>
@@ -87,6 +134,6 @@
       </div>
     </section>
   </main>
-  <script src="app.js?v=15"></script>
+  <script src="app.js?v=16"></script>
 </body>
 </html>
