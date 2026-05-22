@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Две стороны — по 4 числа</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%232563eb'/%3E%3Ctext x='16' y='22' text-anchor='middle' font-size='14' font-family='system-ui,sans-serif' fill='%23fff' font-weight='700'%3EAB%3C/text%3E%3C/svg%3E">
-  <link rel="stylesheet" href="styles.css?v=10">
+  <link rel="stylesheet" href="styles.css?v=13">
 </head>
 <body>
   <main class="app">
@@ -35,6 +35,16 @@
     <section class="panel" aria-labelledby="panel-b-heading">
       <h2 id="panel-b-heading">Сторона B</h2>
       <div id="b-rows" class="b-rows"></div>
+      <button type="button" id="show-quads-btn" class="toggle-quads-btn">
+        ПОКАЗАТЬ ВСЕ ЧЕТВЁРКИ
+      </button>
+      <div id="quads-panel" class="quads-panel is-collapsed">
+        <p class="quads-hint">
+          38 вариантов B (цифры 1–8, по возрастанию, сумма чётная). Нажмите, чтобы выбрать.
+          <span id="quads-selected-count"></span>
+        </p>
+        <div id="quads-grid" class="quads-grid"></div>
+      </div>
       <button type="button" id="calc-btn" class="calc-btn">СЧИТАЕМ</button>
     </section>
 
@@ -74,6 +84,6 @@
       </div>
     </section>
   </main>
-  <script src="app.js?v=12"></script>
+  <script src="app.js?v=14"></script>
 </body>
 </html>

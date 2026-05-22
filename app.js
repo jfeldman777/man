@@ -16,9 +16,31 @@ const resultsFoot = document.getElementById("results-foot");
 const resultsHint = document.getElementById("results-hint");
 const batchResults = document.getElementById("batch-results");
 const singleResults = document.getElementById("single-results");
+const showQuadsBtn = document.getElementById("show-quads-btn");
+const quadsPanel = document.getElementById("quads-panel");
+const quadsGrid = document.getElementById("quads-grid");
+const quadsSelectedCount = document.getElementById("quads-selected-count");
 
 let detailsExpanded = false;
 let bRowIdCounter = 0;
+let quadsGridBuilt = false;
+
+/** 38 четвёрок: цифры 1–8, все разные, по возрастанию, сумма чётная */
+const ALL_EVEN_QUADS = (() => {
+  const list = [];
+  for (let a = MIN_DIGIT; a <= MAX_DIGIT; a++) {
+    for (let b = a + 1; b <= MAX_DIGIT; b++) {
+      for (let c = b + 1; c <= MAX_DIGIT; c++) {
+        for (let d = c + 1; d <= MAX_DIGIT; d++) {
+          if ((a + b + c + d) % 2 === 0) {
+            list.push(`${a}${b}${c}${d}`);
+          }
+        }
+      }
+    }
+  }
+  return list;
+})();
 
 function otherSide(side) {
   return side === "A" ? "B" : "A";
@@ -444,6 +466,50 @@ function getValidatedBCodes() {
   return { codes, allOk };
 }
 
+function getSelectedQuadCodes() {
+  return [...quadsGrid.querySelectorAll(".quad-btn.is-active")]
+    .map((btn) => btn.dataset.code)
+    .sort();
+}
+
+function updateQuadsSelectedCount() {
+  const n = getSelectedQuadCodes().length;
+  quadsSelectedCount.textContent = n > 0 ? ` Выбрано: ${n}.` : "";
+}
+
+function buildQuadsGrid() {
+  if (quadsGridBuilt) return;
+  quadsGridBuilt = true;
+
+  const fragment = document.createDocumentFragment();
+  for (const code of ALL_EVEN_QUADS) {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "quad-btn";
+    btn.dataset.code = code;
+    btn.textContent = code;
+    btn.title = `Вариант B: ${code}`;
+    btn.setAttribute("aria-pressed", "false");
+    btn.addEventListener("click", () => {
+      const on = btn.classList.toggle("is-active");
+      btn.setAttribute("aria-pressed", String(on));
+      updateQuadsSelectedCount();
+    });
+    fragment.appendChild(btn);
+  }
+  quadsGrid.appendChild(fragment);
+}
+
+function getBCodesForCalculate() {
+  const selectedQuads = getSelectedQuadCodes();
+  if (selectedQuads.length > 0) {
+    return { codes: selectedQuads, fromQuads: true, allOk: true };
+  }
+
+  const { codes, allOk } = getValidatedBCodes();
+  return { codes, fromQuads: false, allOk };
+}
+
 function formatFinaleCountsHtml(counts) {
   if (counts.length === 0) return "<li>—</li>";
   return counts
@@ -578,13 +644,17 @@ function renderResults(data) {
 function validateInputs() {
   const parsedA = parseSide(inputA.value);
   setFieldError(errorA, inputA, parsedA.ok ? "" : parsedA.message);
-  const bOk = validateAllBRows();
-  const { codes, allOk: bParseOk } = getValidatedBCodes();
+  const bSource = getBCodesForCalculate();
+  const rowsOk = bSource.fromQuads || validateAllBRows();
 
   return {
     parsedA,
-    bCodes: codes,
-    bothOk: parsedA.ok && bOk && bParseOk && codes.length > 0,
+    bCodes: bSource.codes,
+    bothOk:
+      parsedA.ok &&
+      rowsOk &&
+      bSource.allOk &&
+      bSource.codes.length > 0,
   };
 }
 
@@ -603,10 +673,27 @@ function clearResults(message) {
 }
 
 function calculateAndRender() {
-  const { parsedA, bCodes, bothOk } = validateInputs();
+  const parsedA = parseSide(inputA.value);
+  setFieldError(errorA, inputA, parsedA.ok ? "" : parsedA.message);
 
-  if (!bothOk) {
-    clearResults("Исправьте сторону A и все варианты B, затем нажмите СЧИТАЕМ.");
+  if (!parsedA.ok) {
+    clearResults("Исправьте сторону A и нажмите СЧИТАЕМ.");
+    return;
+  }
+
+  const bSource = getBCodesForCalculate();
+
+  if (!bSource.fromQuads) {
+    validateAllBRows();
+    if (!bSource.allOk) {
+      clearResults("Исправьте варианты B в полях или выберите четвёрки.");
+      return;
+    }
+  }
+
+  const bCodes = bSource.codes;
+  if (bCodes.length === 0) {
+    clearResults("Выберите четвёрки кнопками или введите варианты B.");
     return;
   }
 
@@ -629,6 +716,19 @@ inputA.addEventListener("input", () => {
 
 calcBtn.addEventListener("click", calculateAndRender);
 
+showQuadsBtn.addEventListener("click", () => {
+  const hidden = quadsPanel.classList.toggle("is-collapsed");
+  if (!hidden) {
+    buildQuadsGrid();
+    updateQuadsSelectedCount();
+    showQuadsBtn.textContent = "СКРЫТЬ ЧЕТВЁРКИ";
+    showQuadsBtn.setAttribute("aria-expanded", "true");
+  } else {
+    showQuadsBtn.textContent = "ПОКАЗАТЬ ВСЕ ЧЕТВЁРКИ";
+    showQuadsBtn.setAttribute("aria-expanded", "false");
+  }
+});
+
 detailsBtn.addEventListener("click", () => {
   setDetailsExpanded(!detailsExpanded);
 });
@@ -646,5 +746,5 @@ batchResults.addEventListener("click", (event) => {
   btn.setAttribute("aria-expanded", String(isOpen));
 });
 
-addBRow("5678");
+addBRow("");
 clearResults("Введите числа и нажмите СЧИТАЕМ.");

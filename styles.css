@@ -119,6 +119,85 @@ input.invalid {
   outline-offset: 2px;
 }
 
+.toggle-quads-btn {
+  display: block;
+  width: 100%;
+  margin-top: 0.65rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  color: #0f766e;
+  background: #ecfdf5;
+  border: 1px solid #99f6e4;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.toggle-quads-btn:hover {
+  background: #d1fae5;
+}
+
+.toggle-quads-btn:focus {
+  outline: 2px solid #14b8a6;
+  outline-offset: 2px;
+}
+
+.quads-panel.is-collapsed {
+  display: none;
+}
+
+.quads-hint {
+  margin: 0.65rem 0 0.5rem;
+  font-size: 0.82rem;
+  color: #555;
+  line-height: 1.4;
+}
+
+#quads-selected-count {
+  font-weight: 600;
+  color: #0f766e;
+}
+
+.quads-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  max-height: 220px;
+  overflow-y: auto;
+  padding: 0.25rem 0 0.5rem;
+}
+
+.quad-btn {
+  min-width: 3.1rem;
+  padding: 0.4rem 0.35rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.06em;
+  color: #475569;
+  background: #f8fafc;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.quad-btn:hover {
+  background: #e2e8f0;
+}
+
+.quad-btn.is-active {
+  color: #fff;
+  background: #0f766e;
+  border-color: #0d9488;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.12);
+}
+
+.quad-btn:focus {
+  outline: 2px solid #14b8a6;
+  outline-offset: 1px;
+}
+
 .field-block {
   display: flex;
   flex-direction: column;
