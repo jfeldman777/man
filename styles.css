@@ -125,6 +125,47 @@ input.invalid {
   color: #666;
 }
 
+.results-summary {
+  margin-bottom: 0.75rem;
+}
+
+.summary-title {
+  margin: 0 0 0.5rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #444;
+}
+
+.details-btn {
+  display: block;
+  width: 100%;
+  margin-bottom: 0.75rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: #2563eb;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.details-btn:hover {
+  background: #dbeafe;
+}
+
+.details-btn:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+.results-details.is-collapsed {
+  display: none;
+}
+
 .table-wrap {
   overflow-x: auto;
 }
@@ -167,22 +208,6 @@ input.invalid {
   border-top: 2px solid #dde2e8;
   border-bottom: none;
   background: #f8f9fb;
-}
-
-.results-table tfoot .totals-finale td {
-  background: #f8f9fb;
-  border-bottom: none;
-  padding-top: 0.25rem;
-  padding-bottom: 0.75rem;
-}
-
-.totals-finale-title {
-  font-weight: 600;
-  font-size: 0.82rem;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-  color: #666;
-  margin-bottom: 0.35rem;
 }
 
 .totals-finale-list {

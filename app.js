@@ -8,9 +8,15 @@ const inputB = document.getElementById("side-b");
 const errorA = document.getElementById("error-a");
 const errorB = document.getElementById("error-b");
 const calcBtn = document.getElementById("calc-btn");
+const resultsSummary = document.getElementById("results-summary");
+const finaleSummaryList = document.getElementById("finale-summary-list");
+const detailsBtn = document.getElementById("details-btn");
+const resultsDetails = document.getElementById("results-details");
 const resultsBody = document.getElementById("results-body");
 const resultsFoot = document.getElementById("results-foot");
 const resultsHint = document.getElementById("results-hint");
+
+let detailsExpanded = false;
 
 const inputs = [inputA, inputB];
 
@@ -257,9 +263,25 @@ function countFinaleLabels(parties) {
   return [...counts.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
 }
 
+function setDetailsExpanded(expanded) {
+  detailsExpanded = expanded;
+  resultsDetails.classList.toggle("is-collapsed", !expanded);
+  detailsBtn.textContent = expanded ? "СКРЫТЬ" : "ПОДРОБНЕЕ";
+  detailsBtn.setAttribute("aria-expanded", String(expanded));
+}
+
 function renderResults(data) {
   const { parties, totalA, totalB } = data;
   const finaleCounts = countFinaleLabels(parties);
+
+  const finaleSummary = finaleCounts
+    .map(([label, n]) => `<li>${label} — ${n} ${pluralRaz(n)}</li>`)
+    .join("");
+
+  finaleSummaryList.innerHTML = finaleSummary || "<li>—</li>";
+  resultsSummary.hidden = false;
+  detailsBtn.hidden = false;
+  setDetailsExpanded(false);
 
   resultsBody.innerHTML = parties
     .map(
@@ -275,20 +297,10 @@ function renderResults(data) {
     )
     .join("");
 
-  const finaleSummary = finaleCounts
-    .map(([label, n]) => `<li>${label} — ${n} ${pluralRaz(n)}</li>`)
-    .join("");
-
   resultsFoot.innerHTML = `
     <tr class="totals">
       <td colspan="4">Итого выигрыш A / B</td>
       <td>${totalA} / ${totalB}</td>
-    </tr>
-    <tr class="totals-finale">
-      <td colspan="5">
-        <div class="totals-finale-title">Итого по финалам</div>
-        <ul class="totals-finale-list">${finaleSummary || "<li>—</li>"}</ul>
-      </td>
     </tr>
   `;
 }
@@ -306,8 +318,12 @@ function validateInputs() {
 function clearResults(message) {
   resultsHint.hidden = false;
   resultsHint.textContent = message;
+  resultsSummary.hidden = true;
+  detailsBtn.hidden = true;
+  setDetailsExpanded(false);
   resultsBody.innerHTML = "";
   resultsFoot.innerHTML = "";
+  finaleSummaryList.innerHTML = "";
 }
 
 function calculateAndRender() {
@@ -330,5 +346,9 @@ inputs.forEach((el) => {
 });
 
 calcBtn.addEventListener("click", calculateAndRender);
+
+detailsBtn.addEventListener("click", () => {
+  setDetailsExpanded(!detailsExpanded);
+});
 
 clearResults("Введите числа и нажмите СЧИТАЕМ.");

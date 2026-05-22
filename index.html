@@ -51,21 +51,33 @@
 
     <section class="panel" aria-labelledby="results-heading">
       <h2 id="results-heading">Результаты</h2>
-      <p id="results-hint" class="results-hint" hidden></p>
-      <div class="table-wrap">
-        <table class="results-table">
-          <thead>
-            <tr>
-              <th>№</th>
-              <th>Начальный ход</th>
-              <th>Финальные ходы</th>
-              <th>Финал партии</th>
-              <th>Выигрыш A / B</th>
-            </tr>
-          </thead>
-          <tbody id="results-body"></tbody>
-          <tfoot id="results-foot"></tfoot>
-        </table>
+      <p id="results-hint" class="results-hint"></p>
+
+      <div id="results-summary" class="results-summary" hidden>
+        <h3 class="summary-title">Итого финалы</h3>
+        <ul id="finale-summary-list" class="totals-finale-list"></ul>
+      </div>
+
+      <button type="button" id="details-btn" class="details-btn" hidden>
+        ПОДРОБНЕЕ
+      </button>
+
+      <div id="results-details" class="results-details is-collapsed">
+        <div class="table-wrap">
+          <table class="results-table">
+            <thead>
+              <tr>
+                <th>№</th>
+                <th>Начальный ход</th>
+                <th>Финальные ходы</th>
+                <th>Финал партии</th>
+                <th>Выигрыш A / B</th>
+              </tr>
+            </thead>
+            <tbody id="results-body"></tbody>
+            <tfoot id="results-foot"></tfoot>
+          </table>
+        </div>
       </div>
     </section>
   </main>
