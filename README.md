@@ -16,6 +16,14 @@ npx serve .
 
 Затем откройте http://localhost:8080
 
+## Сайт на GitHub Pages
+
+https://jfeldman777.github.io/man/
+
+В репозитории: **Settings → Pages → Build and deployment → Source: GitHub Actions**.
+
+После каждого push в `main` workflow «Deploy to GitHub Pages» обновляет сайт (1–3 минуты).
+
 ## Изменение формулы
 
 Логика расчёта в `app.js`, функция `calculate(sideA, sideB)` — каждый аргумент массив из 4 цифр.
