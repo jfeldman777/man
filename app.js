@@ -74,17 +74,61 @@ function setFieldError(errorEl, inputEl, message) {
   }
 }
 
-/** Очки за пару (число стороны A, число стороны B) */
-function scorePair(a, b) {
-  if (a === b) {
+/** Очки за пару двух ходов подряд (предыдущий → следующий) */
+function pairPoints(prevNum, prevSide, nextNum, nextSide) {
+  if (prevNum === nextNum) {
+    return { scores: { A: 2, B: 2 }, type: "competition" };
+  }
+
+  let sideSmall;
+  let sideLarge;
+  if (prevNum < nextNum) {
+    sideSmall = prevSide;
+    sideLarge = nextSide;
+  } else {
+    sideSmall = nextSide;
+    sideLarge = prevSide;
+  }
+
+  const small = Math.min(prevNum, nextNum);
+  const large = Math.max(prevNum, nextNum);
+
+  const scores = { A: 0, B: 0 };
+
+  if (large === small + 1) {
+    scores[sideSmall] = 3;
+    scores[sideLarge] = 4;
+    return { scores, type: "cooperation" };
+  }
+
+  scores[sideSmall] = 1;
+  scores[sideLarge] = -100;
+  return { scores, type: "war" };
+}
+
+/** Очки по числам сторон A и B в паре (для финала) */
+function scorePair(aNum, bNum) {
+  if (aNum === bNum) {
     return { A: 2, B: 2 };
   }
-  if (Math.abs(a - b) === 1) {
-    if (a < b) return { A: 3, B: 4 };
+  if (Math.abs(aNum - bNum) === 1) {
+    if (aNum < bNum) return { A: 3, B: 4 };
     return { A: 4, B: 3 };
   }
-  if (a < b) return { A: 1, B: -100 };
+  if (aNum < bNum) return { A: 1, B: -100 };
   return { A: -100, B: 1 };
+}
+
+const PAIR_TYPE_RANK = { cooperation: 2, competition: 1, war: 0 };
+
+function isBetterMove(candidate, gain, type, best) {
+  if (!best) return true;
+  if (gain > best.gain) return true;
+  if (gain < best.gain) return false;
+  const typeRank = PAIR_TYPE_RANK[type] ?? 0;
+  const bestTypeRank = PAIR_TYPE_RANK[best.type] ?? 0;
+  if (typeRank !== bestTypeRank) return typeRank > bestTypeRank;
+  return candidate > best.move;
 }
 
 /** Тип финальной пары по последним ходам сторон A и B */
@@ -131,22 +175,17 @@ function isMoveSequenceRepeating(moves) {
 }
 
 function chooseMove(pool, side, lastNum, lastSide) {
-  let bestMove = pool[0];
-  let bestGain = -Infinity;
+  let best = null;
 
   for (const candidate of pool) {
-    const aNum = lastSide === "A" ? lastNum : candidate;
-    const bNum = lastSide === "A" ? candidate : lastNum;
-    const pts = scorePair(aNum, bNum);
-    const gain = pts[side];
-
-    if (gain > bestGain || (gain === bestGain && candidate < bestMove)) {
-      bestGain = gain;
-      bestMove = candidate;
+    const { scores, type } = pairPoints(lastNum, lastSide, candidate, side);
+    const gain = scores[side];
+    if (isBetterMove(candidate, gain, type, best)) {
+      best = { move: candidate, gain, type };
     }
   }
 
-  return bestMove;
+  return best.move;
 }
 
 /**
@@ -176,9 +215,7 @@ function playParty(startNum, startSide, poolA, poolB) {
     const next = chooseMove(pool, turn, lastNum, lastSide);
     moves.push(next);
 
-    const aNum = lastSide === "A" ? lastNum : next;
-    const bNum = lastSide === "A" ? next : lastNum;
-    const pts = scorePair(aNum, bNum);
+    const { scores: pts } = pairPoints(lastNum, lastSide, next, turn);
     scores.A += pts.A;
     scores.B += pts.B;
 
