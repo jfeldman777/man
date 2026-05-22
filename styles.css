@@ -119,6 +119,30 @@ input.invalid {
   outline-offset: 2px;
 }
 
+.conflict-free-btn {
+  margin-top: 0.5rem;
+  background: #7c3aed;
+}
+
+.conflict-free-btn:hover {
+  background: #6d28d9;
+}
+
+.conflict-free-btn:active {
+  background: #5b21b6;
+}
+
+.batch-intro {
+  margin: 0 0 0.85rem;
+  padding: 0.5rem 0.65rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #5b21b6;
+  background: #f5f3ff;
+  border-radius: 6px;
+  border: 1px solid #ddd6fe;
+}
+
 .toggle-quads-btn {
   display: block;
   width: 100%;

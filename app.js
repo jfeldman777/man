@@ -20,6 +20,7 @@ const showQuadsBtn = document.getElementById("show-quads-btn");
 const quadsPanel = document.getElementById("quads-panel");
 const quadsGrid = document.getElementById("quads-grid");
 const quadsSelectedCount = document.getElementById("quads-selected-count");
+const conflictFreeBtn = document.getElementById("conflict-free-btn");
 
 let detailsExpanded = false;
 let bRowIdCounter = 0;
@@ -570,11 +571,23 @@ function buildPartiesTableHtml(data) {
   `;
 }
 
-function renderBatchResults(items) {
+function partyHasWar(party) {
+  return (
+    party.finale.label.startsWith("война") || party.endReason === "война"
+  );
+}
+
+function renderBatchResults(items, options = {}) {
   hideSingleResults();
   batchResults.hidden = false;
 
-  batchResults.innerHTML = items
+  const intro = options.intro
+    ? `<p class="batch-intro">${options.intro}</p>`
+    : "";
+
+  batchResults.innerHTML =
+    intro +
+    items
     .map((item) => {
       if (item.error) {
         return `
@@ -598,6 +611,44 @@ function renderBatchResults(items) {
       `;
     })
     .join("");
+}
+
+function calculateConflictFreeAndRender() {
+  const parsedA = parseSide(inputA.value);
+  setFieldError(errorA, inputA, parsedA.ok ? "" : parsedA.message);
+
+  if (!parsedA.ok) {
+    clearResults("Задайте корректную сторону A и нажмите БЕСКОНФЛИКТНЫЕ.");
+    return;
+  }
+
+  const peaceful = [];
+
+  for (const code of ALL_EVEN_QUADS) {
+    const parsedB = parseSide(code);
+    if (!parsedB.ok) continue;
+
+    const data = calculate(parsedA.digits, parsedB.digits);
+    if (!data.parties.some(partyHasWar)) {
+      peaceful.push({
+        code,
+        counts: countFinaleLabels(data.parties),
+        data,
+      });
+    }
+  }
+
+  if (peaceful.length === 0) {
+    clearResults(
+      `Среди ${ALL_EVEN_QUADS.length} четвёрок для данной A нет бесконфликтных вариантов B.`
+    );
+    return;
+  }
+
+  resultsHint.hidden = true;
+  renderBatchResults(peaceful, {
+    intro: `Бесконфликтные: ${peaceful.length} из ${ALL_EVEN_QUADS.length} (ни в одной из 8 партий нет войны)`,
+  });
 }
 
 function calculateAllVariants(sideA, variantCodes) {
@@ -715,6 +766,8 @@ inputA.addEventListener("input", () => {
 });
 
 calcBtn.addEventListener("click", calculateAndRender);
+
+conflictFreeBtn.addEventListener("click", calculateConflictFreeAndRender);
 
 showQuadsBtn.addEventListener("click", () => {
   const hidden = quadsPanel.classList.toggle("is-collapsed");
