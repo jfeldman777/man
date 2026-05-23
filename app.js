@@ -27,6 +27,8 @@ const helpDialog = document.getElementById("help-dialog");
 let detailsExpanded = false;
 let bRowIdCounter = 0;
 let quadsGridBuilt = false;
+/** @type {Record<string, string>} */
+let quadHints = {};
 
 /** 38 четвёрок: цифры 1–8, все разные, по возрастанию, сумма чётная */
 const ALL_EVEN_QUADS = (() => {
@@ -480,25 +482,63 @@ function updateQuadsSelectedCount() {
   quadsSelectedCount.textContent = n > 0 ? ` Выбрано: ${n}.` : "";
 }
 
-function buildQuadsGrid() {
-  if (quadsGridBuilt) return;
+function parseQuadHintsText(text) {
+  const hints = {};
+  for (const line of text.split(/\r?\n/)) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith("#")) continue;
+    const match = trimmed.match(/^(\d{4})\s*[-=–]\s*(.+)$/);
+    if (match) hints[match[1]] = match[2].trim();
+  }
+  return hints;
+}
+
+async function loadQuadHints() {
+  try {
+    const response = await fetch("quad-hints.txt", { cache: "no-store" });
+    if (response.ok) {
+      quadHints = parseQuadHintsText(await response.text());
+    }
+  } catch {
+    quadHints = {};
+  }
+}
+
+function createQuadButton(code) {
+  const btn = document.createElement("button");
+  btn.type = "button";
+  btn.className = "quad-btn";
+  btn.dataset.code = code;
+  btn.setAttribute("aria-pressed", "false");
+
+  btn.textContent = code;
+  const hint = quadHints[code];
+  if (hint) {
+    btn.classList.add("quad-btn-has-hint");
+    btn.title = hint;
+    btn.setAttribute("aria-label", `${code}, ${hint}`);
+  } else {
+    btn.title = "?";
+    btn.setAttribute("aria-label", `${code}, ?`);
+  }
+
+  btn.addEventListener("click", () => {
+    const on = btn.classList.toggle("is-active");
+    btn.setAttribute("aria-pressed", String(on));
+    updateQuadsSelectedCount();
+  });
+
+  return btn;
+}
+
+function buildQuadsGrid(force = false) {
+  if (quadsGridBuilt && !force) return;
   quadsGridBuilt = true;
+  quadsGrid.innerHTML = "";
 
   const fragment = document.createDocumentFragment();
   for (const code of ALL_EVEN_QUADS) {
-    const btn = document.createElement("button");
-    btn.type = "button";
-    btn.className = "quad-btn";
-    btn.dataset.code = code;
-    btn.textContent = code;
-    btn.title = `Вариант B: ${code}`;
-    btn.setAttribute("aria-pressed", "false");
-    btn.addEventListener("click", () => {
-      const on = btn.classList.toggle("is-active");
-      btn.setAttribute("aria-pressed", String(on));
-      updateQuadsSelectedCount();
-    });
-    fragment.appendChild(btn);
+    fragment.appendChild(createQuadButton(code));
   }
   quadsGrid.appendChild(fragment);
 }
@@ -791,10 +831,11 @@ helpDialog.addEventListener("click", (event) => {
   if (event.target === helpDialog) helpDialog.close();
 });
 
-showQuadsBtn.addEventListener("click", () => {
+showQuadsBtn.addEventListener("click", async () => {
   const hidden = quadsPanel.classList.toggle("is-collapsed");
   if (!hidden) {
-    buildQuadsGrid();
+    await loadQuadHints();
+    buildQuadsGrid(true);
     updateQuadsSelectedCount();
     showQuadsBtn.textContent = "СКРЫТЬ ЧЕТВЁРКИ";
     showQuadsBtn.setAttribute("aria-expanded", "true");
