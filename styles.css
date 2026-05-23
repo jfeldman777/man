@@ -246,6 +246,20 @@ input.invalid {
   border: 1px solid #ddd6fe;
 }
 
+.batch-codes-line {
+  margin: -0.35rem 0 0.85rem;
+  padding: 0.45rem 0.65rem;
+  font-size: 0.88rem;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+  line-height: 1.45;
+  color: #334155;
+  background: #f8fafc;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+  word-break: break-word;
+}
+
 .toggle-quads-btn {
   display: block;
   width: 100%;

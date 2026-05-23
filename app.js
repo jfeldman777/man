@@ -587,8 +587,13 @@ function renderBatchResults(items, options = {}) {
     ? `<p class="batch-intro">${options.intro}</p>`
     : "";
 
+  const codesLine = options.codesLine
+    ? `<p class="batch-codes-line">${options.codesLine}</p>`
+    : "";
+
   batchResults.innerHTML =
     intro +
+    codesLine +
     items
     .map((item) => {
       if (item.error) {
@@ -650,6 +655,7 @@ function calculateConflictFreeAndRender() {
   resultsHint.hidden = true;
   renderBatchResults(peaceful, {
     intro: `Бесконфликтные: ${peaceful.length} из ${ALL_EVEN_QUADS.length} (ни в одной из 8 партий нет войны)`,
+    codesLine: peaceful.map((p) => p.code).join(", "),
   });
 }
 
