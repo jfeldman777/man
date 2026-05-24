@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Две стороны — по 4 числа</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%232563eb'/%3E%3Ctext x='16' y='22' text-anchor='middle' font-size='14' font-family='system-ui,sans-serif' fill='%23fff' font-weight='700'%3EAB%3C/text%3E%3C/svg%3E">
-  <link rel="stylesheet" href="styles.css?v=22">
+  <link rel="stylesheet" href="styles.css?v=31">
 </head>
 <body>
   <main class="app">
@@ -41,7 +41,9 @@
         <h3>Кнопки</h3>
         <ul>
           <li><strong>ПОКАЗАТЬ ВСЕ ЧЕТВЁРКИ</strong> — 38 вариантов B (цифры по возрастанию, сумма чётная). На кнопке — код; подсказка при наведении из <strong>quad-hints.txt</strong> (<code>1258 - текст</code>), иначе <code>?</code>.</li>
-          <li><strong>СЧИТАЕМ</strong> — расчёт для A и B: если выбраны четвёрки — по ним; иначе по полям B. Один B — краткий итог; несколько — список <strong>В####</strong> с финалами.</li>
+          <li><strong>СЧИТАЕМ</strong> — A и B: если в поле B есть число — по нему (даже при выбранных четвёрках); иначе по выбранным кнопкам. Один B — одна таблица из 8 партий; несколько — список <strong>В####</strong>.</li>
+          <li><strong>Пьесы</strong> — матрица войн; под ней комментарии <strong>по уровням</strong> из <strong>play-comments.txt</strong> (<code>=== 6 - текст</code>).</li>
+          <li><strong>МАТРИЦА ВОЙН</strong> — минимум 2 выбранные четвёрки вручную (сбрасывает выбор пьесы).</li>
           <li><strong>БЕСКОНФЛИКТНЫЕ</strong> — из 38 четвёрок оставляет только те B, где ни в одной из 8 партий с данной A нет <em>войны</em>.</li>
         </ul>
 
@@ -92,6 +94,15 @@
         </p>
         <div id="quads-grid" class="quads-grid"></div>
       </div>
+      <label class="play-select-block">
+        <span>Пьесы</span>
+        <select id="play-select" class="play-select">
+          <option value="">— выберите пьесу —</option>
+        </select>
+      </label>
+      <button type="button" id="war-matrix-btn" class="calc-btn war-matrix-btn">
+        МАТРИЦА ВОЙН
+      </button>
       <button type="button" id="conflict-free-btn" class="calc-btn conflict-free-btn">
         БЕСКОНФЛИКТНЫЕ
       </button>
@@ -134,6 +145,6 @@
       </div>
     </section>
   </main>
-  <script src="app.js?v=22"></script>
+  <script src="app.js?v=31"></script>
 </body>
 </html>

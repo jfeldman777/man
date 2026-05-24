@@ -21,6 +21,8 @@ const quadsPanel = document.getElementById("quads-panel");
 const quadsGrid = document.getElementById("quads-grid");
 const quadsSelectedCount = document.getElementById("quads-selected-count");
 const conflictFreeBtn = document.getElementById("conflict-free-btn");
+const warMatrixBtn = document.getElementById("war-matrix-btn");
+const playSelect = document.getElementById("play-select");
 const helpBtn = document.getElementById("help-btn");
 const helpDialog = document.getElementById("help-dialog");
 
@@ -29,6 +31,10 @@ let bRowIdCounter = 0;
 let quadsGridBuilt = false;
 /** @type {Record<string, string>} */
 let quadHints = {};
+/** @type {{ name: string, entries: { code: string, name: string }[] }[]} */
+let quadPlays = [];
+/** @type {{ name: string, characters: { names: string[], notes: { score: number, text: string }[] }[] }[]} */
+let playComments = [];
 
 /** 38 четвёрок: цифры 1–8, все разные, по возрастанию, сумма чётная */
 const ALL_EVEN_QUADS = (() => {
@@ -471,6 +477,26 @@ function getValidatedBCodes() {
   return { codes, allOk };
 }
 
+/** Коды B только из непустых полей ввода */
+function getBCodesFromFields() {
+  const codes = [];
+  let allOk = true;
+  let hasAny = false;
+
+  getBRowElements().forEach((row) => {
+    const input = row.querySelector(".b-row-input");
+    const raw = input.value.trim();
+    if (raw.length === 0) return;
+
+    hasAny = true;
+    const parsed = parseSide(raw);
+    if (!parsed.ok) allOk = false;
+    else codes.push(raw);
+  });
+
+  return { codes, allOk, hasAny };
+}
+
 function getSelectedQuadCodes() {
   return [...quadsGrid.querySelectorAll(".quad-btn.is-active")]
     .map((btn) => btn.dataset.code)
@@ -482,25 +508,258 @@ function updateQuadsSelectedCount() {
   quadsSelectedCount.textContent = n > 0 ? ` Выбрано: ${n}.` : "";
 }
 
-function parseQuadHintsText(text) {
-  const hints = {};
+function escapeHtml(text) {
+  return text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+function normalizePlayName(name) {
+  return name.trim().toLowerCase();
+}
+
+function parsePlayCommentsText(text) {
+  /** @type {{ name: string, characters: { names: string[], notes: { score: number, text: string }[] }[] }[]} */
+  const plays = [];
+  /** @type {{ name: string, characters: { names: string[], notes: { score: number, text: string }[] }[] } | null} */
+  let currentPlay = null;
+  /** @type {{ names: string[], notes: { score: number, text: string }[] }[]} */
+  let currentGroups = [];
+
   for (const line of text.split(/\r?\n/)) {
     const trimmed = line.trim();
     if (!trimmed || trimmed.startsWith("#")) continue;
-    const match = trimmed.match(/^(\d{4})\s*[-=–]\s*(.+)$/);
-    if (match) hints[match[1]] = match[2].trim();
+
+    if (trimmed.startsWith("===")) {
+      const noteMatch = trimmed.match(/^===\s*(\d+)\s*(?:[-=–]\s*|\s+)(.+)$/);
+      if (noteMatch && currentGroups.length > 0) {
+        const note = {
+          score: Number(noteMatch[1]),
+          text: noteMatch[2].trim(),
+        };
+        for (const group of currentGroups) {
+          group.notes.push(note);
+        }
+      }
+      continue;
+    }
+
+    if (trimmed.startsWith("==")) {
+      const charLine = trimmed.replace(/^==\s*/, "").replace(/\s*=\s*$/, "").trim();
+      if (!charLine || !currentPlay) continue;
+
+      const names = charLine.split(",").map((s) => s.trim()).filter(Boolean);
+      if (names.length === 0) continue;
+
+      const group = { names, notes: [] };
+      currentPlay.characters.push(group);
+      currentGroups = [group];
+      continue;
+    }
+
+    if (trimmed.startsWith("=")) {
+      const playName = trimmed.replace(/^=\s*/, "").replace(/\s*=\s*$/, "").trim();
+      if (!playName || playName.toLowerCase() === "конец") continue;
+      if (currentPlay) plays.push(currentPlay);
+      currentPlay = { name: playName, characters: [] };
+      currentGroups = [];
+    }
   }
-  return hints;
+
+  if (currentPlay) plays.push(currentPlay);
+  return plays;
+}
+
+function findPlayComments(playName) {
+  const key = normalizePlayName(playName);
+  return playComments.find((p) => normalizePlayName(p.name) === key);
+}
+
+function findQuadPlay(playName) {
+  const key = normalizePlayName(playName);
+  return quadPlays.find((p) => normalizePlayName(p.name) === key);
+}
+
+function codeForCharacterName(charName, names, codes) {
+  if (!names) return "";
+  for (const code of codes) {
+    if (normalizePlayName(names[code]) === normalizePlayName(charName)) {
+      return code;
+    }
+  }
+  return "";
+}
+
+function formatCommentGroupTitle(groupNames, names, codes) {
+  const codesForHeroes = groupNames
+    .map((hero) => codeForCharacterName(hero, names, codes))
+    .filter(Boolean);
+  const uniqueCodes = [...new Set(codesForHeroes)];
+
+  if (uniqueCodes.length === 1 && groupNames.length > 1) {
+    return `${groupNames.join(", ")} ${uniqueCodes[0]}`;
+  }
+
+  return groupNames
+    .map((hero) => {
+      const code = codeForCharacterName(hero, names, codes);
+      return code ? `${hero} ${code}` : hero;
+    })
+    .join(", ");
+}
+
+function getPlayCommentsByLevel(playName, names, codes) {
+  const commentPlay = findPlayComments(playName);
+  if (!commentPlay) return [];
+
+  /** @type {Map<number, { heroes: string, text: string }[]>} */
+  const byLevel = new Map();
+
+  for (const group of commentPlay.characters) {
+    const heroTitle = formatCommentGroupTitle(group.names, names, codes);
+    for (const note of group.notes) {
+      if (!byLevel.has(note.score)) {
+        byLevel.set(note.score, []);
+      }
+      byLevel.get(note.score).push({ heroes: heroTitle, text: note.text });
+    }
+  }
+
+  return [...byLevel.entries()]
+    .sort((a, b) => b[0] - a[0])
+    .map(([level, items]) => ({ level, items }));
+}
+
+function buildPlayCommentsHtml(playName, names, codes) {
+  const levels = getPlayCommentsByLevel(playName, names, codes);
+  if (levels.length === 0) return "";
+
+  const levelBlocks = levels
+    .map(({ level, items }) => {
+      const rows = items
+        .map(
+          (item) =>
+            `<li class="play-comment-level-item"><span class="play-comment-heroes">${escapeHtml(item.heroes)}</span><span class="play-comment-sep">—</span><span class="play-comment-text">${escapeHtml(item.text)}</span></li>`
+        )
+        .join("");
+
+      return `
+        <article class="play-comment-level">
+          <h4 class="play-comment-level-title">Уровень ${level}</h4>
+          <ul class="play-comment-level-list">${rows}</ul>
+        </article>
+      `;
+    })
+    .join("");
+
+  return `
+    <section class="play-comments" aria-labelledby="play-comments-title">
+      <h3 id="play-comments-title" class="play-comments-heading">Комментарии по уровням</h3>
+      <div class="play-comments-levels">${levelBlocks}</div>
+    </section>
+  `;
+}
+
+async function loadPlayComments() {
+  try {
+    const response = await fetch("play-comments.txt", { cache: "no-store" });
+    if (response.ok) {
+      playComments = parsePlayCommentsText(await response.text());
+    }
+  } catch {
+    playComments = [];
+  }
+}
+
+async function loadPlayData() {
+  await Promise.all([loadQuadHints(), loadPlayComments()]);
+}
+
+function parseQuadHintsText(text) {
+  const hints = {};
+  /** @type {{ name: string, entries: { code: string, name: string }[] }[]} */
+  const plays = [];
+  /** @type {{ name: string, entries: { code: string, name: string }[] } | null} */
+  let currentPlay = null;
+
+  for (const line of text.split(/\r?\n/)) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith("#")) continue;
+
+    const section = trimmed.match(/^=\s*(.+?)\s*=$/);
+    if (section) {
+      const sectionName = section[1].trim();
+      if (sectionName.toLowerCase() === "конец") {
+        if (currentPlay && currentPlay.entries.length > 0) {
+          plays.push(currentPlay);
+        }
+        currentPlay = null;
+        continue;
+      }
+      if (currentPlay && currentPlay.entries.length > 0) {
+        plays.push(currentPlay);
+      }
+      currentPlay = { name: sectionName, entries: [] };
+      continue;
+    }
+
+    const match = trimmed.match(/^(\d{4})\s*[-=–]\s*(.+)$/);
+    if (match) {
+      const code = match[1];
+      const name = match[2].trim();
+      hints[code] = name;
+      if (currentPlay) {
+        currentPlay.entries.push({ code, name });
+      }
+    }
+  }
+
+  if (currentPlay && currentPlay.entries.length > 0) {
+    plays.push(currentPlay);
+  }
+
+  return { hints, plays };
+}
+
+function populatePlaySelect() {
+  if (!playSelect) return;
+
+  const prev = playSelect.value;
+  playSelect.innerHTML = "";
+
+  const placeholder = document.createElement("option");
+  placeholder.value = "";
+  placeholder.textContent = "— выберите пьесу —";
+  playSelect.appendChild(placeholder);
+
+  for (let i = 0; i < quadPlays.length; i++) {
+    const play = quadPlays[i];
+    const opt = document.createElement("option");
+    opt.value = String(i);
+    opt.textContent = `${play.name} (${consolidatePlayEntries(play.entries).length})`;
+    playSelect.appendChild(opt);
+  }
+
+  if (prev && playSelect.querySelector(`option[value="${prev}"]`)) {
+    playSelect.value = prev;
+  }
 }
 
 async function loadQuadHints() {
   try {
     const response = await fetch("quad-hints.txt", { cache: "no-store" });
     if (response.ok) {
-      quadHints = parseQuadHintsText(await response.text());
+      const parsed = parseQuadHintsText(await response.text());
+      quadHints = parsed.hints;
+      quadPlays = parsed.plays;
+      populatePlaySelect();
     }
   } catch {
     quadHints = {};
+    quadPlays = [];
+    populatePlaySelect();
   }
 }
 
@@ -543,14 +802,24 @@ function buildQuadsGrid(force = false) {
   quadsGrid.appendChild(fragment);
 }
 
-function getBCodesForCalculate() {
+/**
+ * @param {{ preferFields?: boolean }} options
+ * preferFields: для СЧИТАЕМ — если в полях B есть число, не брать выбранные четвёрки
+ */
+function getBCodesForCalculate(options = {}) {
+  const { preferFields = false } = options;
+  const fields = getBCodesFromFields();
   const selectedQuads = getSelectedQuadCodes();
+
+  if (preferFields && fields.hasAny) {
+    return { codes: fields.codes, fromQuads: false, allOk: fields.allOk };
+  }
+
   if (selectedQuads.length > 0) {
     return { codes: selectedQuads, fromQuads: true, allOk: true };
   }
 
-  const { codes, allOk } = getValidatedBCodes();
-  return { codes, fromQuads: false, allOk };
+  return { codes: fields.codes, fromQuads: false, allOk: fields.allOk };
 }
 
 function formatFinaleCountsHtml(counts) {
@@ -569,6 +838,7 @@ function hideSingleResults() {
 function showSingleResults() {
   singleResults.hidden = false;
   batchResults.hidden = true;
+  batchResults.innerHTML = "";
 }
 
 function buildPartiesRowsHtml(parties) {
@@ -617,6 +887,189 @@ function partyHasWar(party) {
   return (
     party.finale.label.startsWith("война") || party.endReason === "война"
   );
+}
+
+function formatSigned(n) {
+  if (n === 0) return "0";
+  return n > 0 ? `+${n}` : String(n);
+}
+
+/** Выигрыш row (как A) против col (как B) — сумма очков A только в партиях с войной */
+function warGainBetween(rowDigits, colDigits) {
+  const { parties } = calculate(rowDigits, colDigits);
+  let gain = 0;
+  let warCount = 0;
+
+  for (const party of parties) {
+    if (partyHasWar(party)) {
+      warCount++;
+      gain += party.scores.A;
+    }
+  }
+
+  return { gain, warCount, partyCount: parties.length };
+}
+
+function buildWarMatrix(codes) {
+  const parsed = codes.map((code) => ({ code, ...parseSide(code) }));
+  const matrix = [];
+
+  for (let i = 0; i < parsed.length; i++) {
+    const row = [];
+    for (let j = 0; j < parsed.length; j++) {
+      if (i === j) {
+        row.push({ gain: 0, warCount: 0, partyCount: 0 });
+      } else {
+        row.push(warGainBetween(parsed[i].digits, parsed[j].digits));
+      }
+    }
+    matrix.push(row);
+  }
+
+  return { parsed, matrix };
+}
+
+function quadMatrixLabel(code, names) {
+  const name = names?.[code] ?? quadHints[code];
+  return name ? `${code} (${name})` : code;
+}
+
+function warMatrixColLabel(code, names) {
+  const name = names?.[code] ?? quadHints[code];
+  if (name) {
+    return `<span class="war-matrix-axis war-matrix-axis-col"><span class="war-matrix-char">${escapeHtml(name)}</span><span class="war-matrix-code">${code}</span></span>`;
+  }
+  return `<span class="war-matrix-axis war-matrix-axis-col"><span class="war-matrix-code">${code}</span></span>`;
+}
+
+function warMatrixRowLabel(code, names) {
+  const name = names?.[code] ?? quadHints[code];
+  if (name) {
+    return `<span class="war-matrix-axis war-matrix-axis-row">${escapeHtml(name)} ${code}</span>`;
+  }
+  return `<span class="war-matrix-axis war-matrix-axis-row">${code}</span>`;
+}
+
+function characterName(code, names) {
+  return names?.[code] ?? quadHints[code] ?? code;
+}
+
+function buildWarMatrixHtml(codes, matrixData, names) {
+  const { matrix } = matrixData;
+  const headerCells = codes
+    .map((code) => `<th scope="col" class="war-matrix-col-head">${warMatrixColLabel(code, names)}</th>`)
+    .join("");
+
+  const bodyRows = codes
+    .map((rowCode, i) => {
+      const cells = matrix[i]
+        .map((cell, j) => {
+          if (i === j) {
+            return '<td class="war-matrix-diag">0</td>';
+          }
+          const colCode = codes[j];
+          const title = `${rowCode} (${characterName(rowCode, names)}) против ${colCode} (${characterName(colCode, names)}): ${cell.warCount} ${pluralVoyna(cell.warCount)} из ${cell.partyCount} партий`;
+          return `<td class="war-matrix-cell" title="${escapeHtml(title)}">${formatSigned(cell.gain)}</td>`;
+        })
+        .join("");
+      return `<tr><th scope="row" class="war-matrix-row-head">${warMatrixRowLabel(rowCode, names)}</th>${cells}</tr>`;
+    })
+    .join("");
+
+  return `
+    <div class="table-wrap war-matrix-wrap">
+      <table class="war-matrix">
+        <thead>
+          <tr>
+            <th scope="col" class="war-matrix-corner"></th>
+            ${headerCells}
+          </tr>
+        </thead>
+        <tbody>${bodyRows}</tbody>
+      </table>
+    </div>
+  `;
+}
+
+function renderWarMatrix(codes, options = {}) {
+  hideSingleResults();
+  batchResults.hidden = false;
+
+  const names = options.names ?? null;
+  const matrixData = buildWarMatrix(codes);
+  const labels = codes.map((code) => quadMatrixLabel(code, names)).join(", ");
+  const playTitle = options.playName ? ` — «${options.playName}»` : "";
+  const commentsHtml =
+    options.playName && buildPlayCommentsHtml(options.playName, names, codes);
+
+  batchResults.innerHTML = `
+    <p class="batch-intro war-matrix-intro">
+      Матрица войн${playTitle}: ${codes.length} четвёрок. Ячейка — выигрыш строки против столбца (сумма очков A только в партиях с войной). Диагональ — 0.
+    </p>
+    <p class="batch-codes-line">${escapeHtml(labels)}</p>
+    ${buildWarMatrixHtml(codes, matrixData, names)}
+    ${commentsHtml || ""}
+  `;
+}
+
+function calculateWarMatrixAndRender() {
+  const selected = getSelectedQuadCodes();
+
+  if (selected.length < 2) {
+    clearResults("Матрица войн: выберите минимум 2 четвёрки из 38.");
+    return;
+  }
+
+  if (playSelect) playSelect.value = "";
+  resultsHint.hidden = true;
+  renderWarMatrix(selected);
+}
+
+function consolidatePlayEntries(entries) {
+  const byCode = new Map();
+
+  for (const { code, name } of entries) {
+    if (!byCode.has(code)) {
+      byCode.set(code, { code, names: [name] });
+      continue;
+    }
+    const group = byCode.get(code);
+    const exists = group.names.some(
+      (n) => normalizePlayName(n) === normalizePlayName(name)
+    );
+    if (!exists) group.names.push(name);
+  }
+
+  return [...byCode.values()].map(({ code, names }) => ({
+    code,
+    name: names.join(", "),
+  }));
+}
+
+function renderPlayWarMatrix(playIndex) {
+  const play = quadPlays[Number(playIndex)];
+  if (!play) return;
+
+  const consolidated = consolidatePlayEntries(play.entries);
+
+  if (consolidated.length < 2) {
+    clearResults(`«${play.name}»: нужно минимум 2 разных четвёрки у персонажей.`);
+    return;
+  }
+
+  const codes = consolidated.map((e) => e.code);
+  const names = Object.fromEntries(consolidated.map((e) => [e.code, e.name]));
+
+  resultsHint.hidden = true;
+  renderWarMatrix(codes, { playName: play.name, names });
+}
+
+function pluralVoyna(n) {
+  const mod10 = n % 10;
+  const mod100 = n % 100;
+  if (mod10 === 1 && mod100 !== 11) return "война";
+  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 10 || mod100 >= 20)) return "войны";
+  return "войн";
 }
 
 function renderBatchResults(items, options = {}) {
@@ -780,7 +1233,7 @@ function calculateAndRender() {
     return;
   }
 
-  const bSource = getBCodesForCalculate();
+  const bSource = getBCodesForCalculate({ preferFields: true });
 
   if (!bSource.fromQuads) {
     validateAllBRows();
@@ -801,6 +1254,7 @@ function calculateAndRender() {
   if (bCodes.length === 1) {
     const parsedB = parseSide(bCodes[0]);
     showSingleResults();
+    setDetailsExpanded(false);
     renderResults(calculate(parsedA.digits, parsedB.digits));
     return;
   }
@@ -816,6 +1270,20 @@ inputA.addEventListener("input", () => {
 calcBtn.addEventListener("click", calculateAndRender);
 
 conflictFreeBtn.addEventListener("click", calculateConflictFreeAndRender);
+
+warMatrixBtn.addEventListener("click", async () => {
+  await loadPlayData();
+  calculateWarMatrixAndRender();
+});
+
+if (playSelect) {
+  playSelect.addEventListener("change", async () => {
+    const idx = playSelect.value;
+    if (idx === "") return;
+    await loadPlayData();
+    renderPlayWarMatrix(idx);
+  });
+}
 
 helpBtn.addEventListener("click", () => {
   if (typeof helpDialog.showModal === "function") {
@@ -834,7 +1302,7 @@ helpDialog.addEventListener("click", (event) => {
 showQuadsBtn.addEventListener("click", async () => {
   const hidden = quadsPanel.classList.toggle("is-collapsed");
   if (!hidden) {
-    await loadQuadHints();
+    await loadPlayData();
     buildQuadsGrid(true);
     updateQuadsSelectedCount();
     showQuadsBtn.textContent = "СКРЫТЬ ЧЕТВЁРКИ";
@@ -863,4 +1331,5 @@ batchResults.addEventListener("click", (event) => {
 });
 
 addBRow("");
+loadPlayData();
 clearResults("Введите числа и нажмите СЧИТАЕМ.");
