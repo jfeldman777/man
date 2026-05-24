@@ -42,8 +42,13 @@ h1 {
   line-height: 1.45;
 }
 
-.help-btn {
+.app-header-actions {
+  display: flex;
   flex-shrink: 0;
+  gap: 0.45rem;
+}
+
+.header-icon-btn {
   width: 2.25rem;
   height: 2.25rem;
   padding: 0;
@@ -51,18 +56,29 @@ h1 {
   font-weight: 700;
   line-height: 1;
   color: #fff;
-  background: #64748b;
   border: none;
   border-radius: 50%;
   cursor: pointer;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
 }
 
+.help-btn {
+  background: #64748b;
+}
+
 .help-btn:hover {
   background: #475569;
 }
 
-.help-btn:focus {
+.why-btn {
+  background: #dc2626;
+}
+
+.why-btn:hover {
+  background: #b91c1c;
+}
+
+.header-icon-btn:focus {
   outline: 2px solid #3b82f6;
   outline-offset: 2px;
 }
@@ -129,6 +145,45 @@ h1 {
 
 .help-dialog li {
   margin-bottom: 0.35rem;
+}
+
+.why-dialog-lead {
+  margin: 0 0 0.75rem;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: #334155;
+}
+
+.why-stats-table {
+  width: 100%;
+  margin: 0.75rem 0 1rem;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+
+.why-stats-table th,
+.why-stats-table td {
+  padding: 0.45rem 0.55rem;
+  border: 1px solid #e2e8f0;
+  text-align: center;
+}
+
+.why-stats-table th {
+  background: #f8fafc;
+  font-weight: 600;
+  color: #475569;
+}
+
+.why-stats-table td:first-child {
+  text-align: left;
+  font-weight: 500;
+}
+
+.help-dialog p {
+  margin: 0.5rem 0;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: #444;
 }
 
 .panel {

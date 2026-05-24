@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Две стороны — по 4 числа</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%232563eb'/%3E%3Ctext x='16' y='22' text-anchor='middle' font-size='14' font-family='system-ui,sans-serif' fill='%23fff' font-weight='700'%3EAB%3C/text%3E%3C/svg%3E">
-  <link rel="stylesheet" href="styles.css?v=31">
+  <link rel="stylesheet" href="styles.css?v=32">
 </head>
 <body>
   <main class="app">
@@ -16,16 +16,81 @@
           На каждой стороне — 4 разных числа от 1 до 8. Сторона A одна, вариантов B может быть несколько.
         </p>
       </div>
-      <button
-        type="button"
-        id="help-btn"
-        class="help-btn"
-        aria-label="Справка по использованию"
-        title="Справка"
-      >
-        ?
-      </button>
+      <div class="app-header-actions">
+        <button
+          type="button"
+          id="why-btn"
+          class="header-icon-btn why-btn"
+          aria-label="Зачем считать конфликты"
+          title="Зачем считать конфликты"
+        >
+          !
+        </button>
+        <button
+          type="button"
+          id="help-btn"
+          class="header-icon-btn help-btn"
+          aria-label="Справка по использованию"
+          title="Справка"
+        >
+          ?
+        </button>
+      </div>
     </header>
+
+    <dialog id="why-dialog" class="help-dialog" aria-labelledby="why-dialog-title">
+      <div class="help-dialog-inner">
+        <button type="button" class="help-dialog-close" aria-label="Закрыть">×</button>
+        <h2 id="why-dialog-title">Зачем считать конфликты</h2>
+
+        <p class="why-dialog-lead">
+          Счётчик нужен не «для красоты»: он показывает, насколько нестабильно сочетаются участники
+          в ваших правилах игры — до того, как вы отправите их в одну команду.
+        </p>
+
+        <h3>Пример: космическая экспедиция</h3>
+        <ul>
+          <li><strong>Роль</strong> в экипаже — это <strong>тройка</strong> (три уровня из цифр 1–8, по возрастанию).</li>
+          <li><strong>Живой человек</strong> — <strong>четвёрка</strong> (дополняем роль четвёртой цифрой; одна из 38 допустимых четвёрок).</li>
+        </ul>
+        <p>
+          Берём пять ролей: <strong>234, 345, 456, 567, 678</strong>. Каждую дополняем до четвёрки
+          (у каждой тройки по три варианта). Считаем суммарное число <strong>конфликтов (войн)</strong>
+          между всеми парами участников — как в <strong>МАТРИЦА ВОЙН</strong>.
+        </p>
+
+        <table class="why-stats-table">
+          <thead>
+            <tr>
+              <th scope="col">Состав</th>
+              <th scope="col">Наихудшее</th>
+              <th scope="col">В среднем</th>
+              <th scope="col">Наилучшее</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>5 ролей (234 … 678)</td>
+              <td><strong>56</strong></td>
+              <td><strong>≈ 29</strong></td>
+              <td><strong>4</strong></td>
+            </tr>
+            <tr>
+              <td>4 роли (без 678)</td>
+              <td><strong>32</strong></td>
+              <td><strong>≈ 13</strong></td>
+              <td><strong>0</strong></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <p>
+          Один и тот же «скелет» ролей, но разный набор людей и разный способ дополнения —
+          и конфликтов может быть от нуля до десятков. Поэтому имеет смысл перебирать варианты
+          (матрица войн, бесконфликтные, пьесы) и выбирать состав осознанно.
+        </p>
+      </div>
+    </dialog>
 
     <dialog id="help-dialog" class="help-dialog" aria-labelledby="help-dialog-title">
       <div class="help-dialog-inner">
@@ -145,6 +210,6 @@
       </div>
     </section>
   </main>
-  <script src="app.js?v=31"></script>
+  <script src="app.js?v=32"></script>
 </body>
 </html>

@@ -25,6 +25,8 @@ const warMatrixBtn = document.getElementById("war-matrix-btn");
 const playSelect = document.getElementById("play-select");
 const helpBtn = document.getElementById("help-btn");
 const helpDialog = document.getElementById("help-dialog");
+const whyBtn = document.getElementById("why-btn");
+const whyDialog = document.getElementById("why-dialog");
 
 let detailsExpanded = false;
 let bRowIdCounter = 0;
@@ -1285,19 +1287,26 @@ if (playSelect) {
   });
 }
 
-helpBtn.addEventListener("click", () => {
-  if (typeof helpDialog.showModal === "function") {
-    helpDialog.showModal();
-  }
-});
+function setupInfoDialog(button, dialog) {
+  if (!button || !dialog) return;
 
-helpDialog.querySelector(".help-dialog-close").addEventListener("click", () => {
-  helpDialog.close();
-});
+  button.addEventListener("click", () => {
+    if (typeof dialog.showModal === "function") {
+      dialog.showModal();
+    }
+  });
 
-helpDialog.addEventListener("click", (event) => {
-  if (event.target === helpDialog) helpDialog.close();
-});
+  dialog.querySelector(".help-dialog-close")?.addEventListener("click", () => {
+    dialog.close();
+  });
+
+  dialog.addEventListener("click", (event) => {
+    if (event.target === dialog) dialog.close();
+  });
+}
+
+setupInfoDialog(whyBtn, whyDialog);
+setupInfoDialog(helpBtn, helpDialog);
 
 showQuadsBtn.addEventListener("click", async () => {
   const hidden = quadsPanel.classList.toggle("is-collapsed");
