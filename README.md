@@ -18,7 +18,7 @@ npx serve .
 
 ## Сайт на GitHub Pages
 
-https://jfeldman777.github.io/man/
+https://jfeldman777.github.io/books/
 
 В репозитории: **Settings → Pages → Build and deployment → Source: GitHub Actions**.
 
