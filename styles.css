@@ -120,6 +120,18 @@ h1 {
   background: #b91c1c;
 }
 
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  background: #0f766e;
+}
+
+.back-btn:hover {
+  background: #0d9488;
+}
+
 .header-icon-btn:focus {
   outline: 2px solid #3b82f6;
   outline-offset: 2px;

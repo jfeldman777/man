@@ -15,6 +15,8 @@ const STRINGS = {
     whyTitle: "Зачем считать конфликты",
     helpAria: "Справка по использованию",
     helpTitle: "Справка",
+    backAria: "Назад к Дискурсу",
+    backTitle: "Назад к Дискурсу · 3.7.3",
     closeAria: "Закрыть",
     sideA: "Сторона A",
     sideB: "Сторона B",
@@ -87,6 +89,8 @@ const STRINGS = {
     whyTitle: "Why count conflicts",
     helpAria: "Usage help",
     helpTitle: "Help",
+    backAria: "Back to Discourse",
+    backTitle: "Back to Discourse · 3.7.3",
     closeAria: "Close",
     sideA: "Side A",
     sideB: "Side B",
@@ -152,8 +156,19 @@ const STRINGS = {
   },
 };
 
+const DISCOURSE_BACK = {
+  ru: "https://jfeldman777.github.io/gala/index.html?p=3.7.3",
+  en: "https://jfeldman777.github.io/gala/en.html?p=3.7.3",
+};
+
+function detectInitialLang() {
+  const fromUrl = new URLSearchParams(location.search).get("lang");
+  if (fromUrl === "en" || fromUrl === "ru") return fromUrl;
+  return localStorage.getItem(LANG_KEY) === "en" ? "en" : "ru";
+}
+
 /** @type {"ru"|"en"} */
-let currentLang = localStorage.getItem(LANG_KEY) === "en" ? "en" : "ru";
+let currentLang = detectInitialLang();
 
 /**
  * @param {string} key
@@ -196,6 +211,7 @@ const helpBtn = document.getElementById("help-btn");
 const helpDialog = document.getElementById("help-dialog");
 const whyBtn = document.getElementById("why-btn");
 const whyDialog = document.getElementById("why-dialog");
+const backToBook = document.getElementById("back-to-book");
 
 let detailsExpanded = false;
 let bRowIdCounter = 0;
@@ -1566,6 +1582,10 @@ function applyStaticI18n() {
     btn.classList.toggle("is-active", active);
     btn.setAttribute("aria-pressed", String(active));
   });
+
+  if (backToBook) {
+    backToBook.href = DISCOURSE_BACK[currentLang] || DISCOURSE_BACK.ru;
+  }
 
   const quadsHidden = quadsPanel.classList.contains("is-collapsed");
   showQuadsBtn.textContent = quadsHidden ? t("showQuads") : t("hideQuads");
