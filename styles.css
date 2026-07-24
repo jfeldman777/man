@@ -132,6 +132,12 @@ h1 {
   background: #0d9488;
 }
 
+.back-btn-icon {
+  width: 1.15rem;
+  height: 1.15rem;
+  display: block;
+}
+
 .header-icon-btn:focus {
   outline: 2px solid #3b82f6;
   outline-offset: 2px;
