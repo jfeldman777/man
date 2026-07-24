@@ -1,0 +1,38 @@
+# Play comments (file play-comments.en.txt)
+# Format:
+#   = Play title
+#   == Character
+#   == Onegin, Lensky
+#   === 6 - note text
+# Lines with # are ignored. Play and character names must match quad-hints.en.txt
+
+= Woe from Wit
+== Chatsky
+=== 6 - builds dialogue well
+=== 3 - driven
+=== 4 - mission
+=== 5 - not afraid to step forward
+== Molchalin
+=== 1 - greedy
+=== 3 - driven
+=== 6 - reasons
+=== 4 - respects the rules
+
+= Eugene Onegin
+== Onegin, Lensky
+=== 6 - reasons, argues, explores
+=== 5 - independent
+=== 4 - rules
+=== 3 - wants to be first
+
+== Tatyana
+=== 2 - loves nature
+=== 3 - driven
+=== 4 - rules
+=== 5 - takes action
+
+== Olga
+=== 4 - rules
+=== 3 - strong
+=== 2 - like everyone else
+=== 1 - simple soul

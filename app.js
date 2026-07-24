@@ -3,6 +3,175 @@ const MAX_DIGIT = 8;
 const SIDE_LEN = 4;
 const MAX_PARTY_MOVES = 500;
 
+const LANG_KEY = "two-sides-lang";
+
+const STRINGS = {
+  ru: {
+    pageTitle: "Две стороны — по 4 числа",
+    appTitle: "Две стороны",
+    appHint:
+      "На каждой стороне — 4 разных числа от 1 до 8. Сторона A одна, вариантов B может быть несколько.",
+    whyAria: "Зачем считать конфликты",
+    whyTitle: "Зачем считать конфликты",
+    helpAria: "Справка по использованию",
+    helpTitle: "Справка",
+    closeAria: "Закрыть",
+    sideA: "Сторона A",
+    sideB: "Сторона B",
+    fourDigit: "Четырёхзначное число",
+    variantB: "Вариант B {n}",
+    addVariantB: "Добавить вариант B",
+    removeVariant: "Убрать вариант",
+    showQuads: "ПОКАЗАТЬ ВСЕ ЧЕТВЁРКИ",
+    hideQuads: "СКРЫТЬ ЧЕТВЁРКИ",
+    quadsHint:
+      "38 вариантов B (цифры 1–8, по возрастанию, сумма чётная). Нажмите, чтобы выбрать.",
+    selectedCount: " Выбрано: {n}.",
+    plays: "Пьесы",
+    choosePlay: "— выберите пьесу —",
+    warMatrix: "МАТРИЦА ВОЙН",
+    conflictFree: "БЕСКОНФЛИКТНЫЕ",
+    calculate: "СЧИТАЕМ",
+    results: "Результаты",
+    finaleTotals: "Итого финалы",
+    details: "ПОДРОБНЕЕ",
+    hide: "СКРЫТЬ",
+    colNum: "№",
+    colStart: "Начальный ход",
+    colFinalMoves: "Финальные ходы",
+    colFinale: "Финал партии",
+    colScore: "Выигрыш A / B",
+    totalScore: "Итого выигрыш A / B",
+    enter4: "Введите 4 цифры",
+    need4: "Нужно 4 цифры (сейчас {n})",
+    digitsRange: "Цифры только от {min} до {max}",
+    noRepeat: "На стороне цифры не должны повторяться",
+    competition: "конкуренция",
+    cooperation: "кооперация, старший {side}",
+    warLost: "война, проиграл {side}",
+    endWar: "война",
+    endRepeat: "повторение ходов",
+    endLimit: "лимит ходов",
+    times1: "раз",
+    times234: "раза",
+    timesN: "раз",
+    war1: "война",
+    war234: "войны",
+    warN: "войн",
+    variantPrefix: "В",
+    level: "Уровень {n}",
+    commentsByLevel: "Комментарии по уровням",
+    warMatrixIntro:
+      "Матрица войн{play}: {n} четвёрок. Ячейка — выигрыш строки против столбца (сумма очков A только в партиях с войной). Диагональ — 0.",
+    warMatrixNeed2: "Матрица войн: выберите минимум 2 четвёрки из 38.",
+    warMatrixCellTitle:
+      "{row} ({rowName}) против {col} ({colName}): {wars} {warWord} из {parties} партий",
+    playNeed2: "«{name}»: нужно минимум 2 разных четвёрки у персонажей.",
+    conflictFreeNeedA: "Задайте корректную сторону A и нажмите БЕСКОНФЛИКТНЫЕ.",
+    conflictFreeNone:
+      "Среди {n} четвёрок для данной A нет бесконфликтных вариантов B.",
+    conflictFreeIntro:
+      "Бесконфликтные: {count} из {total} (ни в одной из 8 партий нет войны)",
+    fixSideA: "Исправьте сторону A и нажмите СЧИТАЕМ.",
+    fixSideB: "Исправьте варианты B в полях или выберите четвёрки.",
+    chooseB: "Выберите четвёрки кнопками или введите варианты B.",
+    enterAndCalc: "Введите числа и нажмите СЧИТАЕМ.",
+    countLine: "{label} — {n} {times}",
+  },
+  en: {
+    pageTitle: "Two Sides — 4 numbers each",
+    appTitle: "Two Sides",
+    appHint:
+      "Each side has 4 different numbers from 1 to 8. Side A is one; side B can have several variants.",
+    whyAria: "Why count conflicts",
+    whyTitle: "Why count conflicts",
+    helpAria: "Usage help",
+    helpTitle: "Help",
+    closeAria: "Close",
+    sideA: "Side A",
+    sideB: "Side B",
+    fourDigit: "Four-digit number",
+    variantB: "Variant B {n}",
+    addVariantB: "Add variant B",
+    removeVariant: "Remove variant",
+    showQuads: "SHOW ALL QUADS",
+    hideQuads: "HIDE QUADS",
+    quadsHint:
+      "38 B options (digits 1–8, ascending, even sum). Click to select.",
+    selectedCount: " Selected: {n}.",
+    plays: "Plays",
+    choosePlay: "— choose a play —",
+    warMatrix: "WAR MATRIX",
+    conflictFree: "CONFLICT-FREE",
+    calculate: "CALCULATE",
+    results: "Results",
+    finaleTotals: "Finale totals",
+    details: "DETAILS",
+    hide: "HIDE",
+    colNum: "#",
+    colStart: "Opening move",
+    colFinalMoves: "Final moves",
+    colFinale: "Game finale",
+    colScore: "Score A / B",
+    totalScore: "Total score A / B",
+    enter4: "Enter 4 digits",
+    need4: "Need 4 digits (now {n})",
+    digitsRange: "Digits must be from {min} to {max}",
+    noRepeat: "Digits on a side must not repeat",
+    competition: "competition",
+    cooperation: "cooperation, elder {side}",
+    warLost: "war, {side} lost",
+    endWar: "war",
+    endRepeat: "repeated moves",
+    endLimit: "move limit",
+    times1: "time",
+    times234: "times",
+    timesN: "times",
+    war1: "war",
+    war234: "wars",
+    warN: "wars",
+    variantPrefix: "V",
+    level: "Level {n}",
+    commentsByLevel: "Comments by level",
+    warMatrixIntro:
+      "War matrix{play}: {n} quads. Cell — row score vs column (sum of A points only in games with war). Diagonal — 0.",
+    warMatrixNeed2: "War matrix: select at least 2 quads out of 38.",
+    warMatrixCellTitle:
+      "{row} ({rowName}) vs {col} ({colName}): {wars} {warWord} out of {parties} games",
+    playNeed2: "“{name}”: need at least 2 different character quads.",
+    conflictFreeNeedA: "Set a valid side A and press CONFLICT-FREE.",
+    conflictFreeNone:
+      "Among {n} quads for this A there are no conflict-free B options.",
+    conflictFreeIntro:
+      "Conflict-free: {count} of {total} (no war in any of the 8 games)",
+    fixSideA: "Fix side A and press CALCULATE.",
+    fixSideB: "Fix B variants in the fields or select quads.",
+    chooseB: "Select quads with buttons or enter B variants.",
+    enterAndCalc: "Enter numbers and press CALCULATE.",
+    countLine: "{label} — {n} {times}",
+  },
+};
+
+/** @type {"ru"|"en"} */
+let currentLang = localStorage.getItem(LANG_KEY) === "en" ? "en" : "ru";
+
+/**
+ * @param {string} key
+ * @param {Record<string, string|number>} [vars]
+ */
+function t(key, vars = {}) {
+  const table = STRINGS[currentLang] || STRINGS.ru;
+  let text = table[key] ?? STRINGS.ru[key] ?? key;
+  return text.replace(/\{(\w+)\}/g, (_, name) =>
+    vars[name] != null ? String(vars[name]) : "{" + name + "}"
+  );
+}
+
+function isSectionEnd(name) {
+  const n = name.trim().toLowerCase();
+  return n === "конец" || n === "end";
+}
+
 const inputA = document.getElementById("side-a");
 const errorA = document.getElementById("error-a");
 const bRowsList = document.getElementById("b-rows");
@@ -75,23 +244,23 @@ function parseSide(raw) {
   const s = String(raw).trim();
 
   if (s.length === 0) {
-    return { ok: false, message: "Введите 4 цифры" };
+    return { ok: false, message: t("enter4") };
   }
   if (s.length < SIDE_LEN) {
-    return { ok: false, message: `Нужно 4 цифры (сейчас ${s.length})` };
+    return { ok: false, message: t("need4", { n: s.length }) };
   }
 
   const digits = [...s].map((ch) => Number(ch));
 
   for (const d of digits) {
     if (d < MIN_DIGIT || d > MAX_DIGIT) {
-      return { ok: false, message: `Цифры только от ${MIN_DIGIT} до ${MAX_DIGIT}` };
+      return { ok: false, message: t("digitsRange", { min: MIN_DIGIT, max: MAX_DIGIT }) };
     }
   }
 
   const unique = new Set(digits);
   if (unique.size !== SIDE_LEN) {
-    return { ok: false, message: "На стороне цифры не должны повторяться" };
+    return { ok: false, message: t("noRepeat") };
   }
 
   return { ok: true, digits };
@@ -169,23 +338,32 @@ function isBetterMove(candidate, gain, type, best) {
 /** Тип финальной пары по последним ходам сторон A и B */
 function describePartyFinale(lastA, lastB) {
   if (lastA == null || lastB == null) {
-    return { pair: "—", label: "—" };
+    return { pair: "—", type: null, elderSide: null, loser: null };
   }
 
   const pts = scorePair(lastA, lastB);
   const pair = `(A,B) = (${lastA}, ${lastB})`;
 
   if (lastA === lastB) {
-    return { pair, label: "конкуренция" };
+    return { pair, type: "competition", elderSide: null, loser: null };
   }
 
   if (Math.abs(lastA - lastB) === 1) {
     const elderSide = lastA > lastB ? "A" : "B";
-    return { pair, label: `кооперация, старший ${elderSide}` };
+    return { pair, type: "cooperation", elderSide, loser: null };
   }
 
   const loser = pts.A === -100 ? "A" : "B";
-  return { pair, label: `война, проиграл ${loser}` };
+  return { pair, type: "war", elderSide: null, loser };
+}
+
+function formatFinaleLabel(finale) {
+  if (!finale || !finale.type) return "—";
+  if (finale.type === "competition") return t("competition");
+  if (finale.type === "cooperation") {
+    return t("cooperation", { side: finale.elderSide });
+  }
+  return t("warLost", { side: finale.loser });
 }
 
 function getSideLastMoves(moves, startSide) {
@@ -258,9 +436,9 @@ function playParty(startNum, startSide, poolA, poolB) {
     scores.B += pts.B;
 
     if (scores.A <= -100 || scores.B <= -100) {
-      endReason = "война";
+      endReason = "war";
     } else if (registerPosition(moves, startSide, seenPositions)) {
-      endReason = "повторение ходов";
+      endReason = "repeat";
     } else {
       turn = otherSide(turn);
       steps++;
@@ -268,7 +446,7 @@ function playParty(startNum, startSide, poolA, poolB) {
   }
 
   if (!endReason && steps >= MAX_PARTY_MOVES) {
-    endReason = "лимит ходов";
+    endReason = "limit";
   }
 
   const { lastA, lastB } = getSideLastMoves(moves, startSide);
@@ -314,17 +492,20 @@ function calculate(sideA, sideB) {
 }
 
 function pluralRaz(n) {
+  if (currentLang === "en") {
+    return n === 1 ? t("times1") : t("timesN");
+  }
   const mod10 = n % 10;
   const mod100 = n % 100;
-  if (mod10 === 1 && mod100 !== 11) return "раз";
-  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 10 || mod100 >= 20)) return "раза";
-  return "раз";
+  if (mod10 === 1 && mod100 !== 11) return t("times1");
+  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 10 || mod100 >= 20)) return t("times234");
+  return t("timesN");
 }
 
 function countFinaleLabels(parties) {
   const counts = new Map();
   for (const p of parties) {
-    const { label } = p.finale;
+    const label = formatFinaleLabel(p.finale);
     if (label === "—") continue;
     counts.set(label, (counts.get(label) || 0) + 1);
   }
@@ -332,7 +513,7 @@ function countFinaleLabels(parties) {
 }
 
 function variantLabel(code) {
-  return `В${code}`;
+  return `${t("variantPrefix")}${code}`;
 }
 
 function getBRowElements() {
@@ -406,7 +587,9 @@ function removeBRow(row) {
 function updateBRowLabels() {
   getBRowElements().forEach((row, index) => {
     row.querySelector(".b-row-label").textContent =
-      getBRowElements().length > 1 ? `Вариант B ${index + 1}` : "Четырёхзначное число";
+      getBRowElements().length > 1
+        ? t("variantB", { n: index + 1 })
+        : t("fourDigit");
   });
 }
 
@@ -421,16 +604,16 @@ function updateBRowButtons() {
     const isLast = index === count - 1;
 
     if (count === 1) {
-      const addBtn = createIconButton("+", "Добавить вариант B", "row-btn-add");
+      const addBtn = createIconButton("+", t("addVariantB"), "row-btn-add");
       addBtn.addEventListener("click", () => addBRow());
       actions.appendChild(addBtn);
       return;
     }
 
     if (isLast && !isFirst) {
-      const addBtn = createIconButton("+", "Добавить вариант B", "row-btn-add");
+      const addBtn = createIconButton("+", t("addVariantB"), "row-btn-add");
       addBtn.addEventListener("click", () => addBRow());
-      const removeBtn = createIconButton("−", "Убрать вариант", "row-btn-remove");
+      const removeBtn = createIconButton("−", t("removeVariant"), "row-btn-remove");
       removeBtn.addEventListener("click", () => removeBRow(row));
       actions.appendChild(addBtn);
       actions.appendChild(removeBtn);
@@ -438,7 +621,7 @@ function updateBRowButtons() {
     }
 
     if (!isFirst && !isLast) {
-      const removeBtn = createIconButton("−", "Убрать вариант", "row-btn-remove");
+      const removeBtn = createIconButton("−", t("removeVariant"), "row-btn-remove");
       removeBtn.addEventListener("click", () => removeBRow(row));
       actions.appendChild(removeBtn);
     }
@@ -507,7 +690,7 @@ function getSelectedQuadCodes() {
 
 function updateQuadsSelectedCount() {
   const n = getSelectedQuadCodes().length;
-  quadsSelectedCount.textContent = n > 0 ? ` Выбрано: ${n}.` : "";
+  quadsSelectedCount.textContent = n > 0 ? t("selectedCount", { n }) : "";
 }
 
 function escapeHtml(text) {
@@ -563,7 +746,7 @@ function parsePlayCommentsText(text) {
 
     if (trimmed.startsWith("=")) {
       const playName = trimmed.replace(/^=\s*/, "").replace(/\s*=\s*$/, "").trim();
-      if (!playName || playName.toLowerCase() === "конец") continue;
+      if (!playName || isSectionEnd(playName)) continue;
       if (currentPlay) plays.push(currentPlay);
       currentPlay = { name: playName, characters: [] };
       currentGroups = [];
@@ -649,7 +832,7 @@ function buildPlayCommentsHtml(playName, names, codes) {
 
       return `
         <article class="play-comment-level">
-          <h4 class="play-comment-level-title">Уровень ${level}</h4>
+          <h4 class="play-comment-level-title">${t("level", { n: level })}</h4>
           <ul class="play-comment-level-list">${rows}</ul>
         </article>
       `;
@@ -658,7 +841,7 @@ function buildPlayCommentsHtml(playName, names, codes) {
 
   return `
     <section class="play-comments" aria-labelledby="play-comments-title">
-      <h3 id="play-comments-title" class="play-comments-heading">Комментарии по уровням</h3>
+      <h3 id="play-comments-title" class="play-comments-heading">${t("commentsByLevel")}</h3>
       <div class="play-comments-levels">${levelBlocks}</div>
     </section>
   `;
@@ -666,7 +849,9 @@ function buildPlayCommentsHtml(playName, names, codes) {
 
 async function loadPlayComments() {
   try {
-    const response = await fetch("play-comments.txt", { cache: "no-store" });
+    const file =
+      currentLang === "en" ? "play-comments.en.txt" : "play-comments.txt";
+    const response = await fetch(file, { cache: "no-store" });
     if (response.ok) {
       playComments = parsePlayCommentsText(await response.text());
     }
@@ -693,7 +878,7 @@ function parseQuadHintsText(text) {
     const section = trimmed.match(/^=\s*(.+?)\s*=$/);
     if (section) {
       const sectionName = section[1].trim();
-      if (sectionName.toLowerCase() === "конец") {
+      if (isSectionEnd(sectionName)) {
         if (currentPlay && currentPlay.entries.length > 0) {
           plays.push(currentPlay);
         }
@@ -733,7 +918,7 @@ function populatePlaySelect() {
 
   const placeholder = document.createElement("option");
   placeholder.value = "";
-  placeholder.textContent = "— выберите пьесу —";
+  placeholder.textContent = t("choosePlay");
   playSelect.appendChild(placeholder);
 
   for (let i = 0; i < quadPlays.length; i++) {
@@ -751,7 +936,8 @@ function populatePlaySelect() {
 
 async function loadQuadHints() {
   try {
-    const response = await fetch("quad-hints.txt", { cache: "no-store" });
+    const file = currentLang === "en" ? "quad-hints.en.txt" : "quad-hints.txt";
+    const response = await fetch(file, { cache: "no-store" });
     if (response.ok) {
       const parsed = parseQuadHintsText(await response.text());
       quadHints = parsed.hints;
@@ -827,7 +1013,9 @@ function getBCodesForCalculate(options = {}) {
 function formatFinaleCountsHtml(counts) {
   if (counts.length === 0) return "<li>—</li>";
   return counts
-    .map(([label, n]) => `<li>${label} — ${n} ${pluralRaz(n)}</li>`)
+    .map(([label, n]) =>
+      `<li>${t("countLine", { label, n, times: pluralRaz(n) })}</li>`
+    )
     .join("");
 }
 
@@ -851,7 +1039,7 @@ function buildPartiesRowsHtml(parties) {
           <td>${p.index}</td>
           <td>${p.startNum} (${p.startSide})</td>
           <td>${p.finale.pair}</td>
-          <td class="finale-name">${p.finale.label}</td>
+          <td class="finale-name">${formatFinaleLabel(p.finale)}</td>
           <td>${p.scores.A} / ${p.scores.B}</td>
         </tr>
       `
@@ -866,17 +1054,17 @@ function buildPartiesTableHtml(data) {
       <table class="results-table">
         <thead>
           <tr>
-            <th>№</th>
-            <th>Начальный ход</th>
-            <th>Финальные ходы</th>
-            <th>Финал партии</th>
-            <th>Выигрыш A / B</th>
+            <th>${t("colNum")}</th>
+            <th>${t("colStart")}</th>
+            <th>${t("colFinalMoves")}</th>
+            <th>${t("colFinale")}</th>
+            <th>${t("colScore")}</th>
           </tr>
         </thead>
         <tbody>${buildPartiesRowsHtml(parties)}</tbody>
         <tfoot>
           <tr class="totals">
-            <td colspan="4">Итого выигрыш A / B</td>
+            <td colspan="4">${t("totalScore")}</td>
             <td>${totalA} / ${totalB}</td>
           </tr>
         </tfoot>
@@ -886,9 +1074,7 @@ function buildPartiesTableHtml(data) {
 }
 
 function partyHasWar(party) {
-  return (
-    party.finale.label.startsWith("война") || party.endReason === "война"
-  );
+  return party.finale.type === "war" || party.endReason === "war";
 }
 
 function formatSigned(n) {
@@ -970,7 +1156,15 @@ function buildWarMatrixHtml(codes, matrixData, names) {
             return '<td class="war-matrix-diag">0</td>';
           }
           const colCode = codes[j];
-          const title = `${rowCode} (${characterName(rowCode, names)}) против ${colCode} (${characterName(colCode, names)}): ${cell.warCount} ${pluralVoyna(cell.warCount)} из ${cell.partyCount} партий`;
+          const title = t("warMatrixCellTitle", {
+            row: rowCode,
+            rowName: characterName(rowCode, names),
+            col: colCode,
+            colName: characterName(colCode, names),
+            wars: cell.warCount,
+            warWord: pluralVoyna(cell.warCount),
+            parties: cell.partyCount,
+          });
           return `<td class="war-matrix-cell" title="${escapeHtml(title)}">${formatSigned(cell.gain)}</td>`;
         })
         .join("");
@@ -1000,13 +1194,17 @@ function renderWarMatrix(codes, options = {}) {
   const names = options.names ?? null;
   const matrixData = buildWarMatrix(codes);
   const labels = codes.map((code) => quadMatrixLabel(code, names)).join(", ");
-  const playTitle = options.playName ? ` — «${options.playName}»` : "";
+  const playTitle = options.playName
+    ? currentLang === "en"
+      ? ` — "${options.playName}"`
+      : ` — «${options.playName}»`
+    : "";
   const commentsHtml =
     options.playName && buildPlayCommentsHtml(options.playName, names, codes);
 
   batchResults.innerHTML = `
     <p class="batch-intro war-matrix-intro">
-      Матрица войн${playTitle}: ${codes.length} четвёрок. Ячейка — выигрыш строки против столбца (сумма очков A только в партиях с войной). Диагональ — 0.
+      ${t("warMatrixIntro", { play: playTitle, n: codes.length })}
     </p>
     <p class="batch-codes-line">${escapeHtml(labels)}</p>
     ${buildWarMatrixHtml(codes, matrixData, names)}
@@ -1018,7 +1216,7 @@ function calculateWarMatrixAndRender() {
   const selected = getSelectedQuadCodes();
 
   if (selected.length < 2) {
-    clearResults("Матрица войн: выберите минимум 2 четвёрки из 38.");
+    clearResults(t("warMatrixNeed2"));
     return;
   }
 
@@ -1055,7 +1253,7 @@ function renderPlayWarMatrix(playIndex) {
   const consolidated = consolidatePlayEntries(play.entries);
 
   if (consolidated.length < 2) {
-    clearResults(`«${play.name}»: нужно минимум 2 разных четвёрки у персонажей.`);
+    clearResults(t("playNeed2", { name: play.name }));
     return;
   }
 
@@ -1067,11 +1265,14 @@ function renderPlayWarMatrix(playIndex) {
 }
 
 function pluralVoyna(n) {
+  if (currentLang === "en") {
+    return n === 1 ? t("war1") : t("warN");
+  }
   const mod10 = n % 10;
   const mod100 = n % 100;
-  if (mod10 === 1 && mod100 !== 11) return "война";
-  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 10 || mod100 >= 20)) return "войны";
-  return "войн";
+  if (mod10 === 1 && mod100 !== 11) return t("war1");
+  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 10 || mod100 >= 20)) return t("war234");
+  return t("warN");
 }
 
 function renderBatchResults(items, options = {}) {
@@ -1104,7 +1305,7 @@ function renderBatchResults(items, options = {}) {
           <h3 class="batch-title">${variantLabel(item.code)}</h3>
           <ul class="totals-finale-list">${formatFinaleCountsHtml(item.counts)}</ul>
           <button type="button" class="details-btn batch-details-btn" aria-expanded="false">
-            ПОДРОБНЕЕ
+            ${t("details")}
           </button>
           <div class="batch-details is-collapsed">
             ${buildPartiesTableHtml(item.data)}
@@ -1120,7 +1321,7 @@ function calculateConflictFreeAndRender() {
   setFieldError(errorA, inputA, parsedA.ok ? "" : parsedA.message);
 
   if (!parsedA.ok) {
-    clearResults("Задайте корректную сторону A и нажмите БЕСКОНФЛИКТНЫЕ.");
+    clearResults(t("conflictFreeNeedA"));
     return;
   }
 
@@ -1141,15 +1342,16 @@ function calculateConflictFreeAndRender() {
   }
 
   if (peaceful.length === 0) {
-    clearResults(
-      `Среди ${ALL_EVEN_QUADS.length} четвёрок для данной A нет бесконфликтных вариантов B.`
-    );
+    clearResults(t("conflictFreeNone", { n: ALL_EVEN_QUADS.length }));
     return;
   }
 
   resultsHint.hidden = true;
   renderBatchResults(peaceful, {
-    intro: `Бесконфликтные: ${peaceful.length} из ${ALL_EVEN_QUADS.length} (ни в одной из 8 партий нет войны)`,
+    intro: t("conflictFreeIntro", {
+      count: peaceful.length,
+      total: ALL_EVEN_QUADS.length,
+    }),
     codesLine: peaceful.map((p) => p.code).join(", "),
   });
 }
@@ -1168,7 +1370,7 @@ function calculateAllVariants(sideA, variantCodes) {
 function setDetailsExpanded(expanded) {
   detailsExpanded = expanded;
   resultsDetails.classList.toggle("is-collapsed", !expanded);
-  detailsBtn.textContent = expanded ? "СКРЫТЬ" : "ПОДРОБНЕЕ";
+  detailsBtn.textContent = expanded ? t("hide") : t("details");
   detailsBtn.setAttribute("aria-expanded", String(expanded));
 }
 
@@ -1177,7 +1379,9 @@ function renderResults(data) {
   const finaleCounts = countFinaleLabels(parties);
 
   const finaleSummary = finaleCounts
-    .map(([label, n]) => `<li>${label} — ${n} ${pluralRaz(n)}</li>`)
+    .map(([label, n]) =>
+      `<li>${t("countLine", { label, n, times: pluralRaz(n) })}</li>`
+    )
     .join("");
 
   finaleSummaryList.innerHTML = finaleSummary || "<li>—</li>";
@@ -1189,7 +1393,7 @@ function renderResults(data) {
 
   resultsFoot.innerHTML = `
     <tr class="totals">
-      <td colspan="4">Итого выигрыш A / B</td>
+      <td colspan="4">${t("totalScore")}</td>
       <td>${totalA} / ${totalB}</td>
     </tr>
   `;
@@ -1231,7 +1435,7 @@ function calculateAndRender() {
   setFieldError(errorA, inputA, parsedA.ok ? "" : parsedA.message);
 
   if (!parsedA.ok) {
-    clearResults("Исправьте сторону A и нажмите СЧИТАЕМ.");
+    clearResults(t("fixSideA"));
     return;
   }
 
@@ -1240,14 +1444,14 @@ function calculateAndRender() {
   if (!bSource.fromQuads) {
     validateAllBRows();
     if (!bSource.allOk) {
-      clearResults("Исправьте варианты B в полях или выберите четвёрки.");
+      clearResults(t("fixSideB"));
       return;
     }
   }
 
   const bCodes = bSource.codes;
   if (bCodes.length === 0) {
-    clearResults("Выберите четвёрки кнопками или введите варианты B.");
+    clearResults(t("chooseB"));
     return;
   }
 
@@ -1314,10 +1518,10 @@ showQuadsBtn.addEventListener("click", async () => {
     await loadPlayData();
     buildQuadsGrid(true);
     updateQuadsSelectedCount();
-    showQuadsBtn.textContent = "СКРЫТЬ ЧЕТВЁРКИ";
+    showQuadsBtn.textContent = t("hideQuads");
     showQuadsBtn.setAttribute("aria-expanded", "true");
   } else {
-    showQuadsBtn.textContent = "ПОКАЗАТЬ ВСЕ ЧЕТВЁРКИ";
+    showQuadsBtn.textContent = t("showQuads");
     showQuadsBtn.setAttribute("aria-expanded", "false");
   }
 });
@@ -1335,10 +1539,61 @@ batchResults.addEventListener("click", (event) => {
   const expanded = details.classList.toggle("is-collapsed");
   const isOpen = !expanded;
 
-  btn.textContent = isOpen ? "СКРЫТЬ" : "ПОДРОБНЕЕ";
+  btn.textContent = isOpen ? t("hide") : t("details");
   btn.setAttribute("aria-expanded", String(isOpen));
 });
 
+
+function applyStaticI18n() {
+  document.documentElement.lang = currentLang;
+  document.title = t("pageTitle");
+
+  document.querySelectorAll("[data-i18n]").forEach((el) => {
+    el.textContent = t(el.getAttribute("data-i18n"));
+  });
+  document.querySelectorAll("[data-i18n-title]").forEach((el) => {
+    el.title = t(el.getAttribute("data-i18n-title"));
+  });
+  document.querySelectorAll("[data-i18n-aria]").forEach((el) => {
+    el.setAttribute("aria-label", t(el.getAttribute("data-i18n-aria")));
+  });
+  document.querySelectorAll("[data-lang]").forEach((el) => {
+    el.hidden = el.getAttribute("data-lang") !== currentLang;
+  });
+
+  document.querySelectorAll("[data-lang-set]").forEach((btn) => {
+    const active = btn.getAttribute("data-lang-set") === currentLang;
+    btn.classList.toggle("is-active", active);
+    btn.setAttribute("aria-pressed", String(active));
+  });
+
+  const quadsHidden = quadsPanel.classList.contains("is-collapsed");
+  showQuadsBtn.textContent = quadsHidden ? t("showQuads") : t("hideQuads");
+  updateBRowLabels();
+  updateBRowButtons();
+  updateQuadsSelectedCount();
+  populatePlaySelect();
+}
+
+async function setLanguage(lang) {
+  if (lang !== "ru" && lang !== "en") return;
+  currentLang = lang;
+  localStorage.setItem(LANG_KEY, lang);
+  applyStaticI18n();
+  await loadPlayData();
+  if (quadsGridBuilt && !quadsPanel.classList.contains("is-collapsed")) {
+    buildQuadsGrid(true);
+  }
+  clearResults(t("enterAndCalc"));
+}
+
+document.querySelectorAll("[data-lang-set]").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    setLanguage(btn.getAttribute("data-lang-set"));
+  });
+});
+
+applyStaticI18n();
 addBRow("");
 loadPlayData();
-clearResults("Введите числа и нажмите СЧИТАЕМ.");
+clearResults(t("enterAndCalc"));

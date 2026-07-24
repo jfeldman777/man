@@ -1,0 +1,39 @@
+# Hints for the 38 "Show all quads" buttons
+# One line — one quad. Format:
+#   1234 - your text
+#   5678 = your text
+# Lines with # are comments. Text appears on hover; without a line — `?`.
+
+# Play (for the Plays list and character matrix):
+# = Play title =
+# 1234 - Character name
+# = end =
+
+1258 - Forrest Gump
+= Woe from Wit =
+3456 = Chatsky
+1346 = Molchalin
+2345 = Skalozub
+1245 = Sophia
+2345 = Famusov
+= end =
+
+= Eugene Onegin =
+3456 = Onegin
+3456 = Lensky
+2345 = Tatyana
+1234 = Olga
+= end =
+
+1458 - Gogol
+
+3568 = Pushkin
+1357 = Lermontov
+
+4567 = Mayakovsky
+4578 = Dostoevsky
+
+5678 = Chekhov
+3467 = Darwin
+
+1234 - TV viewers

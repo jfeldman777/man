@@ -5,22 +5,28 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Две стороны — по 4 числа</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%232563eb'/%3E%3Ctext x='16' y='22' text-anchor='middle' font-size='14' font-family='system-ui,sans-serif' fill='%23fff' font-weight='700'%3EAB%3C/text%3E%3C/svg%3E">
-  <link rel="stylesheet" href="styles.css?v=32">
+  <link rel="stylesheet" href="styles.css?v=34">
 </head>
 <body>
   <main class="app">
     <header class="app-header">
       <div class="app-header-text">
-        <h1>Две стороны</h1>
-        <p class="hint">
+        <h1 data-i18n="appTitle">Две стороны</h1>
+        <p class="hint" data-i18n="appHint">
           На каждой стороне — 4 разных числа от 1 до 8. Сторона A одна, вариантов B может быть несколько.
         </p>
       </div>
       <div class="app-header-actions">
+        <div class="lang-switch" role="group" aria-label="Language">
+          <button type="button" id="lang-ru" class="lang-btn is-active" data-lang-set="ru" aria-pressed="true">RU</button>
+          <button type="button" id="lang-en" class="lang-btn" data-lang-set="en" aria-pressed="false">EN</button>
+        </div>
         <button
           type="button"
           id="why-btn"
           class="header-icon-btn why-btn"
+          data-i18n-aria="whyAria"
+          data-i18n-title="whyTitle"
           aria-label="Зачем считать конфликты"
           title="Зачем считать конфликты"
         >
@@ -30,6 +36,8 @@
           type="button"
           id="help-btn"
           class="header-icon-btn help-btn"
+          data-i18n-aria="helpAria"
+          data-i18n-title="helpTitle"
           aria-label="Справка по использованию"
           title="Справка"
         >
@@ -40,98 +48,172 @@
 
     <dialog id="why-dialog" class="help-dialog" aria-labelledby="why-dialog-title">
       <div class="help-dialog-inner">
-        <button type="button" class="help-dialog-close" aria-label="Закрыть">×</button>
-        <h2 id="why-dialog-title">Зачем считать конфликты</h2>
+        <button type="button" class="help-dialog-close" data-i18n-aria="closeAria" aria-label="Закрыть">×</button>
 
-        <p class="why-dialog-lead">
-          Счётчик нужен не «для красоты»: он показывает, насколько нестабильно сочетаются участники
-          в ваших правилах игры — до того, как вы отправите их в одну команду.
-        </p>
+        <div data-lang="ru">
+          <h2 id="why-dialog-title">Зачем считать конфликты</h2>
+          <p class="why-dialog-lead">
+            Счётчик нужен не «для красоты»: он показывает, насколько нестабильно сочетаются участники
+            в ваших правилах игры — до того, как вы отправите их в одну команду.
+          </p>
+          <h3>Пример: космическая экспедиция</h3>
+          <ul>
+            <li><strong>Роль</strong> в экипаже — это <strong>тройка</strong> (три уровня из цифр 1–8, по возрастанию).</li>
+            <li><strong>Живой человек</strong> — <strong>четвёрка</strong> (дополняем роль четвёртой цифрой; одна из 38 допустимых четвёрок).</li>
+          </ul>
+          <p>
+            Берём пять ролей: <strong>234, 345, 456, 567, 678</strong>. Каждую дополняем до четвёрки
+            (у каждой тройки по три варианта). Считаем суммарное число <strong>конфликтов (войн)</strong>
+            между всеми парами участников — как в <strong>МАТРИЦА ВОЙН</strong>.
+          </p>
+          <table class="why-stats-table">
+            <thead>
+              <tr>
+                <th scope="col">Состав</th>
+                <th scope="col">Наихудшее</th>
+                <th scope="col">В среднем</th>
+                <th scope="col">Наилучшее</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>5 ролей (234 … 678)</td>
+                <td><strong>56</strong></td>
+                <td><strong>≈ 29</strong></td>
+                <td><strong>4</strong></td>
+              </tr>
+              <tr>
+                <td>4 роли (без 678)</td>
+                <td><strong>32</strong></td>
+                <td><strong>≈ 13</strong></td>
+                <td><strong>0</strong></td>
+              </tr>
+            </tbody>
+          </table>
+          <p>
+            Один и тот же «скелет» ролей, но разный набор людей и разный способ дополнения —
+            и конфликтов может быть от нуля до десятков. Поэтому имеет смысл перебирать варианты
+            (матрица войн, бесконфликтные, пьесы) и выбирать состав осознанно.
+          </p>
+        </div>
 
-        <h3>Пример: космическая экспедиция</h3>
-        <ul>
-          <li><strong>Роль</strong> в экипаже — это <strong>тройка</strong> (три уровня из цифр 1–8, по возрастанию).</li>
-          <li><strong>Живой человек</strong> — <strong>четвёрка</strong> (дополняем роль четвёртой цифрой; одна из 38 допустимых четвёрок).</li>
-        </ul>
-        <p>
-          Берём пять ролей: <strong>234, 345, 456, 567, 678</strong>. Каждую дополняем до четвёрки
-          (у каждой тройки по три варианта). Считаем суммарное число <strong>конфликтов (войн)</strong>
-          между всеми парами участников — как в <strong>МАТРИЦА ВОЙН</strong>.
-        </p>
-
-        <table class="why-stats-table">
-          <thead>
-            <tr>
-              <th scope="col">Состав</th>
-              <th scope="col">Наихудшее</th>
-              <th scope="col">В среднем</th>
-              <th scope="col">Наилучшее</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>5 ролей (234 … 678)</td>
-              <td><strong>56</strong></td>
-              <td><strong>≈ 29</strong></td>
-              <td><strong>4</strong></td>
-            </tr>
-            <tr>
-              <td>4 роли (без 678)</td>
-              <td><strong>32</strong></td>
-              <td><strong>≈ 13</strong></td>
-              <td><strong>0</strong></td>
-            </tr>
-          </tbody>
-        </table>
-
-        <p>
-          Один и тот же «скелет» ролей, но разный набор людей и разный способ дополнения —
-          и конфликтов может быть от нуля до десятков. Поэтому имеет смысл перебирать варианты
-          (матрица войн, бесконфликтные, пьесы) и выбирать состав осознанно.
-        </p>
+        <div data-lang="en" hidden>
+          <h2 id="why-dialog-title-en">Why count conflicts</h2>
+          <p class="why-dialog-lead">
+            The counter is not decoration: it shows how unstable a lineup is under your game rules —
+            before you put those people on the same team.
+          </p>
+          <h3>Example: a space expedition</h3>
+          <ul>
+            <li>A crew <strong>role</strong> is a <strong>triple</strong> (three levels from digits 1–8, ascending).</li>
+            <li>A <strong>real person</strong> is a <strong>quad</strong> (add a fourth digit; one of 38 valid quads).</li>
+          </ul>
+          <p>
+            Take five roles: <strong>234, 345, 456, 567, 678</strong>. Extend each to a quad
+            (three options per triple). Count total <strong>conflicts (wars)</strong>
+            between all pairs — as in the <strong>WAR MATRIX</strong>.
+          </p>
+          <table class="why-stats-table">
+            <thead>
+              <tr>
+                <th scope="col">Lineup</th>
+                <th scope="col">Worst</th>
+                <th scope="col">Average</th>
+                <th scope="col">Best</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>5 roles (234 … 678)</td>
+                <td><strong>56</strong></td>
+                <td><strong>≈ 29</strong></td>
+                <td><strong>4</strong></td>
+              </tr>
+              <tr>
+                <td>4 roles (without 678)</td>
+                <td><strong>32</strong></td>
+                <td><strong>≈ 13</strong></td>
+                <td><strong>0</strong></td>
+              </tr>
+            </tbody>
+          </table>
+          <p>
+            Same role “skeleton”, different people and different ways to complete the quads —
+            and conflicts can range from zero to dozens. So it pays to explore options
+            (war matrix, conflict-free, plays) and pick a lineup on purpose.
+          </p>
+        </div>
       </div>
     </dialog>
 
     <dialog id="help-dialog" class="help-dialog" aria-labelledby="help-dialog-title">
       <div class="help-dialog-inner">
-        <button type="button" class="help-dialog-close" aria-label="Закрыть">×</button>
-        <h2 id="help-dialog-title">Справка</h2>
+        <button type="button" class="help-dialog-close" data-i18n-aria="closeAria" aria-label="Закрыть">×</button>
 
-        <h3>Ввод</h3>
-        <ul>
-          <li><strong>Сторона A</strong> — одно четырёхзначное число (цифры 1–8, без повторов).</li>
-          <li><strong>Сторона B</strong> — одно или несколько чисел в полях; у последнего поля кнопки <strong>+</strong> и <strong>−</strong>.</li>
-        </ul>
+        <div data-lang="ru">
+          <h2 id="help-dialog-title">Справка</h2>
+          <h3>Ввод</h3>
+          <ul>
+            <li><strong>Сторона A</strong> — одно четырёхзначное число (цифры 1–8, без повторов).</li>
+            <li><strong>Сторона B</strong> — одно или несколько чисел в полях; у последнего поля кнопки <strong>+</strong> и <strong>−</strong>.</li>
+          </ul>
+          <h3>Кнопки</h3>
+          <ul>
+            <li><strong>ПОКАЗАТЬ ВСЕ ЧЕТВЁРКИ</strong> — 38 вариантов B (цифры по возрастанию, сумма чётная). На кнопке — код; подсказка при наведении из <strong>quad-hints.txt</strong> (<code>1258 - текст</code>), иначе <code>?</code>.</li>
+            <li><strong>СЧИТАЕМ</strong> — A и B: если в поле B есть число — по нему (даже при выбранных четвёрках); иначе по выбранным кнопкам. Один B — одна таблица из 8 партий; несколько — список <strong>В####</strong>.</li>
+            <li><strong>Пьесы</strong> — матрица войн; под ней комментарии <strong>по уровням</strong> из <strong>play-comments.txt</strong> (<code>=== 6 - текст</code>).</li>
+            <li><strong>МАТРИЦА ВОЙН</strong> — минимум 2 выбранные четвёрки вручную (сбрасывает выбор пьесы).</li>
+            <li><strong>БЕСКОНФЛИКТНЫЕ</strong> — из 38 четвёрок оставляет только те B, где ни в одной из 8 партий с данной A нет <em>войны</em>.</li>
+          </ul>
+          <h3>Результаты</h3>
+          <ul>
+            <li><strong>Итого финалы</strong> — сколько раз встретились война, кооперация, конкуренция.</li>
+            <li><strong>ПОДРОБНЕЕ</strong> — таблица всех 8 партий для этого варианта B.</li>
+          </ul>
+          <h3>Правила партии (кратко)</h3>
+          <ul>
+            <li>8 партий: 4 старта с цифр A, 4 — с цифр B; ходы чередуются A → B → A → B.</li>
+            <li>За пару ходов: равенство — конкуренция (+2/+2); соседние цифры — кооперация (+3/+4); иначе — война (−100/+1).</li>
+            <li>Конец: война (−100), или повтор позиции (последние ходы A и B как раньше).</li>
+            <li>При равных очках за ход выбирается <strong>меньшее</strong> число из доступных.</li>
+          </ul>
+        </div>
 
-        <h3>Кнопки</h3>
-        <ul>
-          <li><strong>ПОКАЗАТЬ ВСЕ ЧЕТВЁРКИ</strong> — 38 вариантов B (цифры по возрастанию, сумма чётная). На кнопке — код; подсказка при наведении из <strong>quad-hints.txt</strong> (<code>1258 - текст</code>), иначе <code>?</code>.</li>
-          <li><strong>СЧИТАЕМ</strong> — A и B: если в поле B есть число — по нему (даже при выбранных четвёрках); иначе по выбранным кнопкам. Один B — одна таблица из 8 партий; несколько — список <strong>В####</strong>.</li>
-          <li><strong>Пьесы</strong> — матрица войн; под ней комментарии <strong>по уровням</strong> из <strong>play-comments.txt</strong> (<code>=== 6 - текст</code>).</li>
-          <li><strong>МАТРИЦА ВОЙН</strong> — минимум 2 выбранные четвёрки вручную (сбрасывает выбор пьесы).</li>
-          <li><strong>БЕСКОНФЛИКТНЫЕ</strong> — из 38 четвёрок оставляет только те B, где ни в одной из 8 партий с данной A нет <em>войны</em>.</li>
-        </ul>
-
-        <h3>Результаты</h3>
-        <ul>
-          <li><strong>Итого финалы</strong> — сколько раз встретились война, кооперация, конкуренция.</li>
-          <li><strong>ПОДРОБНЕЕ</strong> — таблица всех 8 партий для этого варианта B.</li>
-        </ul>
-
-        <h3>Правила партии (кратко)</h3>
-        <ul>
-          <li>8 партий: 4 старта с цифр A, 4 — с цифр B; ходы чередуются A → B → A → B.</li>
-          <li>За пару ходов: равенство — конкуренция (+2/+2); соседние цифры — кооперация (+3/+4); иначе — война (−100/+1).</li>
-          <li>Конец: война (−100), или повтор позиции (последние ходы A и B как раньше).</li>
-          <li>При равных очках за ход выбирается <strong>меньшее</strong> число из доступных.</li>
-        </ul>
+        <div data-lang="en" hidden>
+          <h2 id="help-dialog-title-en">Help</h2>
+          <h3>Input</h3>
+          <ul>
+            <li><strong>Side A</strong> — one four-digit number (digits 1–8, no repeats).</li>
+            <li><strong>Side B</strong> — one or more numbers in the fields; the last field has <strong>+</strong> and <strong>−</strong>.</li>
+          </ul>
+          <h3>Buttons</h3>
+          <ul>
+            <li><strong>SHOW ALL QUADS</strong> — 38 B options (digits ascending, even sum). Button shows the code; hover hint from <strong>quad-hints.en.txt</strong> (<code>1258 - text</code>), otherwise <code>?</code>.</li>
+            <li><strong>CALCULATE</strong> — A and B: if a B field has a number, use it (even if quads are selected); otherwise use selected buttons. One B — one table of 8 games; several — list <strong>V####</strong>.</li>
+            <li><strong>Plays</strong> — war matrix; below it, <strong>level comments</strong> from <strong>play-comments.en.txt</strong> (<code>=== 6 - text</code>).</li>
+            <li><strong>WAR MATRIX</strong> — at least 2 manually selected quads (clears the play selection).</li>
+            <li><strong>CONFLICT-FREE</strong> — from the 38 quads, keep only those B where none of the 8 games with this A has a <em>war</em>.</li>
+          </ul>
+          <h3>Results</h3>
+          <ul>
+            <li><strong>Finale totals</strong> — how often war, cooperation, and competition appeared.</li>
+            <li><strong>DETAILS</strong> — table of all 8 games for that B option.</li>
+          </ul>
+          <h3>Game rules (short)</h3>
+          <ul>
+            <li>8 games: 4 starts from A digits, 4 from B; turns alternate A → B → A → B.</li>
+            <li>Per move pair: equal — competition (+2/+2); adjacent digits — cooperation (+3/+4); otherwise — war (−100/+1).</li>
+            <li>End: war (−100), or a repeated position (last A and B moves as before).</li>
+            <li>On a tie for points, the <strong>smaller</strong> available number is chosen.</li>
+          </ul>
+        </div>
       </div>
     </dialog>
 
     <section class="panel" aria-labelledby="panel-a-heading">
-      <h2 id="panel-a-heading">Сторона A</h2>
+      <h2 id="panel-a-heading" data-i18n="sideA">Сторона A</h2>
       <label class="field-block">
-        <span>Четырёхзначное число</span>
+        <span data-i18n="fourDigit">Четырёхзначное число</span>
         <input
           type="text"
           id="side-a"
@@ -147,46 +229,46 @@
     </section>
 
     <section class="panel" aria-labelledby="panel-b-heading">
-      <h2 id="panel-b-heading">Сторона B</h2>
+      <h2 id="panel-b-heading" data-i18n="sideB">Сторона B</h2>
       <div id="b-rows" class="b-rows"></div>
-      <button type="button" id="show-quads-btn" class="toggle-quads-btn">
+      <button type="button" id="show-quads-btn" class="toggle-quads-btn" data-i18n="showQuads">
         ПОКАЗАТЬ ВСЕ ЧЕТВЁРКИ
       </button>
       <div id="quads-panel" class="quads-panel is-collapsed">
         <p class="quads-hint">
-          38 вариантов B (цифры 1–8, по возрастанию, сумма чётная). Нажмите, чтобы выбрать.
+          <span data-i18n="quadsHint">38 вариантов B (цифры 1–8, по возрастанию, сумма чётная). Нажмите, чтобы выбрать.</span>
           <span id="quads-selected-count"></span>
         </p>
         <div id="quads-grid" class="quads-grid"></div>
       </div>
       <label class="play-select-block">
-        <span>Пьесы</span>
+        <span data-i18n="plays">Пьесы</span>
         <select id="play-select" class="play-select">
           <option value="">— выберите пьесу —</option>
         </select>
       </label>
-      <button type="button" id="war-matrix-btn" class="calc-btn war-matrix-btn">
+      <button type="button" id="war-matrix-btn" class="calc-btn war-matrix-btn" data-i18n="warMatrix">
         МАТРИЦА ВОЙН
       </button>
-      <button type="button" id="conflict-free-btn" class="calc-btn conflict-free-btn">
+      <button type="button" id="conflict-free-btn" class="calc-btn conflict-free-btn" data-i18n="conflictFree">
         БЕСКОНФЛИКТНЫЕ
       </button>
-      <button type="button" id="calc-btn" class="calc-btn">СЧИТАЕМ</button>
+      <button type="button" id="calc-btn" class="calc-btn" data-i18n="calculate">СЧИТАЕМ</button>
     </section>
 
     <section class="panel" aria-labelledby="results-heading">
-      <h2 id="results-heading">Результаты</h2>
+      <h2 id="results-heading" data-i18n="results">Результаты</h2>
       <p id="results-hint" class="results-hint"></p>
 
       <div id="batch-results" class="batch-results" hidden></div>
 
       <div id="single-results" class="single-results">
         <div id="results-summary" class="results-summary" hidden>
-          <h3 class="summary-title">Итого финалы</h3>
+          <h3 class="summary-title" data-i18n="finaleTotals">Итого финалы</h3>
           <ul id="finale-summary-list" class="totals-finale-list"></ul>
         </div>
 
-        <button type="button" id="details-btn" class="details-btn" hidden>
+        <button type="button" id="details-btn" class="details-btn" hidden data-i18n="details">
           ПОДРОБНЕЕ
         </button>
 
@@ -195,11 +277,11 @@
             <table class="results-table">
               <thead>
                 <tr>
-                  <th>№</th>
-                  <th>Начальный ход</th>
-                  <th>Финальные ходы</th>
-                  <th>Финал партии</th>
-                  <th>Выигрыш A / B</th>
+                  <th data-i18n="colNum">№</th>
+                  <th data-i18n="colStart">Начальный ход</th>
+                  <th data-i18n="colFinalMoves">Финальные ходы</th>
+                  <th data-i18n="colFinale">Финал партии</th>
+                  <th data-i18n="colScore">Выигрыш A / B</th>
                 </tr>
               </thead>
               <tbody id="results-body"></tbody>
@@ -210,6 +292,6 @@
       </div>
     </section>
   </main>
-  <script src="app.js?v=32"></script>
+  <script src="app.js?v=33"></script>
 </body>
 </html>
